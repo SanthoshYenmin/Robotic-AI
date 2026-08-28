@@ -23,13 +23,13 @@ type GLTFResult = GLTF & {
     ['Material.003']: THREE.MeshStandardMaterial
     ['Material.002']: THREE.MeshStandardMaterial
   }
-  animations: GLTFAction[]
+  animations: any[]
 }
 
-export function Model(props: JSX.IntrinsicElements['group']) {
+export function Model(props: any) {
   const { scene } = useGLTF('/models/robot.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
-  const { nodes, materials } = useGraph(clone) as GLTFResult
+  const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <group scale={0.01}>

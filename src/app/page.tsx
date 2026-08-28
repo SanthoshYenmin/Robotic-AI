@@ -4,8 +4,7 @@ import Expertise from "@/components/sections/Expertise";
 import FeaturedProject from "@/components/sections/FeaturedProject";
 import TechnologyStack from "@/components/sections/TechnologyStack";
 import TheProcess from "@/components/sections/TheProcess";
-import FutureStatement from "@/components/sections/FutureStatement";
-import CTASection from "@/components/sections/CTASection";
+import BuildSection from "@/components/sections/BuildSection";
 
 // Thick section divider — adds significant visual breathing room between full-screen sections
 // without breaking GSAP pin triggers (which rely on element positions)
@@ -33,10 +32,8 @@ export default function Home() {
       <TechnologyStack />
       <SectionDivider />
       <TheProcess />
-      <SectionDivider />
-      <FutureStatement />
-      <SectionDivider />
-      <CTASection />
+      <BuildSection />
     </div>
   );
 }
+

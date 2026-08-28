@@ -153,14 +153,14 @@ export default function Introduction() {
       </div>
 
       {/* Foreground Content */}
-      <div className="relative z-20 container mx-auto h-full px-6 md:px-12 lg:px-24 pt-32 pointer-events-none">
+      <div className="relative z-20 container mx-auto h-full px-6 md:px-12 lg:px-24 section-top pointer-events-none">
         
         <div ref={leftContentRef} className="w-full max-w-2xl pointer-events-auto">
           {/* Section Marker */}
-          <div className="flex items-center gap-4 mb-16 opacity-50">
-            <span className="text-white/40 font-mono text-sm tracking-widest">02</span>
-            <div className="w-16 h-px bg-white/20" />
-            <span className="text-white/40 font-mono text-sm uppercase tracking-widest">Introduction</span>
+          <div className="section-label">
+            <span className="section-label-num">02</span>
+            <div className="section-label-divider" />
+            <span className="section-label-text">01 / WHO I AM</span>
           </div>
 
           {/* Small Heading */}
@@ -170,18 +170,17 @@ export default function Introduction() {
           </p>
 
           {/* Title */}
-          <h2 ref={titleRef} className="text-4xl md:text-5xl lg:text-[4rem] font-black text-white leading-[1.05] tracking-tighter mb-8 uppercase flex flex-wrap gap-x-4 gap-y-2">
-            {/* Split text for word animation */}
+          <h2 ref={titleRef} className="section-heading flex flex-wrap gap-x-4 gap-y-2">
             {"Turning Ideas Into Intelligent Machines.".split(" ").map((word, i) => (
-              <span key={i} className={`word inline-block ${word === "Intelligent" || word === "Machines." ? "text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40" : ""}`}>
+              <span key={i} className={`word inline-block ${word === "Intelligent" || word === "Machines." ? "heading-gradient" : ""}`}>
                 {word}
               </span>
             ))}
           </h2>
 
           {/* Content */}
-          <p className="text-white/60 text-base md:text-lg lg:text-xl font-light leading-relaxed max-w-lg mb-12">
-            I’m a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <span className="text-white font-medium">software, hardware, AI,</span> and <span className="text-white font-medium">intelligent algorithms</span> to transform ideas into practical robotic systems.
+          <p className="section-body mb-12">
+            I'm a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <span className="text-white font-medium">software, hardware, AI,</span> and <span className="text-white font-medium">intelligent algorithms</span> to transform ideas into practical robotic systems.
           </p>
 
           {/* Button */}

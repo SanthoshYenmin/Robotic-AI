@@ -1,63 +1,86 @@
+"use client";
+
 import Link from "next/link";
+import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import ScrollTrigger from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
-  const footerLinks = [
-    { name: "Robot", href: "/robot" },
-    { name: "Intelligence", href: "/intelligence" },
-    { name: "Solutions", href: "/solutions" },
-    { name: "Technology", href: "/technology" },
-    { name: "Fleet", href: "/fleet" },
-    { name: "Research", href: "/research" },
-    { name: "Company", href: "/company" },
-  ];
-
-  const socialLinks = [
-    { name: "LinkedIn", href: "#" },
-    { name: "X", href: "#" },
-    { name: "YouTube", href: "#" },
-  ];
+  const containerRef = useRef<HTMLElement>(null);
+  const footerContentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <footer className="bg-[#050505] border-t border-white/5 py-20">
-      <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between gap-12">
-        <div className="flex flex-col gap-6">
-          <Link href="/" className="text-2xl font-bold tracking-widest text-white uppercase flex items-center gap-2">
-            <div className="w-5 h-5 bg-white rounded-sm"></div>
-            Nova Robotics
-          </Link>
-          <p className="text-gray-500 max-w-sm text-sm">
-            Humanoid intelligence designed for the physical world. Intelligence, Built to Move.
-          </p>
-        </div>
+    <div className="w-full px-4 md:px-8 pb-8 md:pb-12 pt-4">
+      <footer ref={containerRef} className="relative bg-[#020810] text-white overflow-hidden pt-24 pb-16 rounded-3xl border border-white/10 shadow-[0_10px_40px_rgba(0,240,255,0.03)]">
+        
+        {/* ── Background Scanlines ── */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-[0.015]"
+        style={{ backgroundImage: "repeating-linear-gradient(to bottom,transparent,transparent 2px,rgba(0,0,0,1) 2px,rgba(0,0,0,1) 4px)" }}
+      />
 
-        <div className="flex flex-col md:flex-row gap-12 md:gap-24">
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white uppercase tracking-widest text-sm font-semibold mb-2">Navigation</h4>
-            {footerLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="text-gray-500 hover:text-white transition-colors text-sm">
-                {link.name}
-              </Link>
-            ))}
+      {/* ── Actual Footer Content ── */}
+      <div ref={footerContentRef} className="container mx-auto spx flex flex-col w-full relative z-20 pointer-events-auto pt-16 pb-8">
+        
+        {/* Bottom Area */}
+        <div className="w-full">
+          {/* Bottom Links */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pb-8">
+            
+            <div className="flex flex-wrap gap-12 md:gap-24">
+              <div className="flex flex-col gap-5">
+                {['WORK', 'ABOUT', 'TECHNOLOGY'].map((link) => (
+                  <Link 
+                    key={link} 
+                    href={link === 'ABOUT' ? '/about' : `/#${link.toLowerCase()}`} 
+                    className="font-mono text-sm tracking-[0.3em] text-white/60 hover:text-[#00f0ff] hover:scale-105 transform origin-left transition-all uppercase"
+                  >
+                    {link}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex flex-col gap-5">
+                {['PROCESS', 'FIGURE', 'CONTACT'].map((link) => (
+                  <Link 
+                    key={link} 
+                    href={link === 'FIGURE' ? '/figure' : `/#${link.toLowerCase()}`} 
+                    className="font-mono text-sm tracking-[0.3em] text-white/60 hover:text-[#00f0ff] hover:scale-105 transform origin-left transition-all uppercase"
+                  >
+                    {link}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-8 md:gap-12">
+              <div className="flex flex-col gap-5 text-left md:text-right items-start md:items-end">
+                {['GITHUB ↗', 'LINKEDIN ↗', 'EMAIL ↗'].map((link) => (
+                  <a key={link} href="#" className="font-mono text-sm tracking-[0.3em] text-white/60 hover:text-[#00f0ff] hover:scale-105 transform origin-right transition-all uppercase">
+                    {link}
+                  </a>
+                ))}
+              </div>
+            </div>
+
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white uppercase tracking-widest text-sm font-semibold mb-2">Social</h4>
-            {socialLinks.map((link) => (
-              <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-sm">
-                {link.name}
-              </a>
-            ))}
+          {/* Tiny Status Text (Now in flow, not absolute) */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full pointer-events-none pb-2 gap-4 mt-8 pt-6 border-t border-white/10">
+            <div className="font-mono text-xs tracking-[0.4em] text-[#00f0ff] animate-pulse">
+              SYSTEM STATUS: READY
+            </div>
+            <div className="font-mono text-xs tracking-[0.4em] text-white/40">
+              &copy; 2026 — SANthosh &middot; NOVA ROBOTICS
+            </div>
           </div>
         </div>
+
       </div>
-      
-      <div className="container mx-auto px-6 md:px-12 mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
-        <p>&copy; {new Date().getFullYear()} NOVA ROBOTICS. All rights reserved.</p>
-        <div className="flex gap-6">
-          <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   );
 }
+

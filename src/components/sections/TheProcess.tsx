@@ -169,17 +169,17 @@ export default function TheProcess() {
         {/* ════════════════════════════════════════
             DESKTOP LAYOUT
         ════════════════════════════════════════ */}
-        <div className="hidden md:grid absolute inset-0 z-10" style={{ gridTemplateColumns: "280px 1fr 240px" }}>
+        <div className="hidden md:flex absolute inset-0 z-10 justify-between w-full pointer-events-none">
 
           {/* ── Left: Stage info ── */}
-          <div className="flex flex-col justify-between px-8 md:px-12 pointer-events-none" style={{ paddingTop: '128px', paddingBottom: '128px' }}>
+          <div className="flex flex-col justify-between h-full" style={{ paddingLeft: 'var(--section-px)', paddingRight: '2rem', paddingTop: '128px', paddingBottom: '128px', width: 'clamp(320px, 30vw, 420px)' }}>
 
             {/* Mission header */}
             <div>
-              <div className="font-mono text-[9px] text-white/30 tracking-[0.4em] uppercase mb-1">
+              <div className="font-mono text-[10px] text-white/40 tracking-[0.4em] uppercase mb-1">
                 MISSION 001
               </div>
-              <div className="font-mono text-[9px] text-[#00f0ff] tracking-[0.3em] uppercase mb-6">
+              <div className="font-mono text-[10px] text-[#00f0ff] tracking-[0.3em] uppercase mb-8">
                 AUTONOMOUS SYSTEM
               </div>
 
@@ -192,16 +192,16 @@ export default function TheProcess() {
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.35 }}
                 >
-                  <div className="font-mono text-[9px] tracking-[0.4em] mb-1" style={{ color: current?.color ?? "#00f0ff" }}>
+                  <div className="font-mono text-[10px] tracking-[0.4em] mb-2" style={{ color: current?.color ?? "#00f0ff" }}>
                     {current?.id ?? "00"} / {current?.codename ?? "INITIALISING"}
                   </div>
                   <h2
-                    className="text-5xl font-black uppercase tracking-tighter leading-none mb-4"
+                    className="text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-[0.9] mb-6"
                     style={{ textShadow: `0 0 30px ${current?.color ?? "#00f0ff"}44` }}
                   >
                     {current?.phase ?? "—"}
                   </h2>
-                  <p className="text-white/50 text-sm font-light leading-relaxed max-w-[220px]">
+                  <p className="text-white/60 text-sm lg:text-base font-light leading-relaxed max-w-sm">
                     {current?.desc ?? "Waiting for mission start…"}
                   </p>
                 </motion.div>
@@ -210,25 +210,24 @@ export default function TheProcess() {
 
             {/* Stage progress dots */}
             <div>
-              <div className="font-mono text-[8px] text-white/25 tracking-[0.3em] mb-3 uppercase">
+              <div className="font-mono text-[9px] text-white/30 tracking-[0.3em] mb-4 uppercase">
                 Stage Progress
               </div>
-              <div className="flex gap-2.5 items-center">
+              <div className="flex gap-3 items-center">
                 {STAGES.map((s, i) => (
-                  <div key={s.id} className="flex flex-col items-center gap-1">
+                  <div key={s.id} className="flex flex-col items-center gap-2">
                     <div
-                      className="transition-all duration-500"
+                      className="transition-all duration-500 rounded-full"
                       style={{
-                        width: i === stage ? 10 : 6,
-                        height: i === stage ? 10 : 6,
-                        borderRadius: "50%",
+                        width: i === stage ? 12 : 8,
+                        height: i === stage ? 12 : 8,
                         background: i <= stage ? (s.color) : "rgba(255,255,255,0.1)",
-                        boxShadow: i === stage ? `0 0 8px ${s.color}` : "none",
+                        boxShadow: i === stage ? `0 0 10px ${s.color}` : "none",
                       }}
                     />
                     <span
-                      className="font-mono text-[7px] tracking-wider"
-                      style={{ color: i <= stage ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)" }}
+                      className="font-mono text-[8px] tracking-wider"
+                      style={{ color: i <= stage ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.3)" }}
                     >
                       {s.id}
                     </span>
@@ -237,7 +236,7 @@ export default function TheProcess() {
               </div>
 
               {/* Progress bar */}
-              <div className="mt-3 w-full h-px bg-white/10 relative">
+              <div className="mt-4 w-full h-px bg-white/10 relative">
                 <motion.div
                   className="absolute top-0 left-0 h-full"
                   style={{ background: "linear-gradient(to right, #00f0ff, #0088ff)" }}
@@ -248,12 +247,12 @@ export default function TheProcess() {
             </div>
           </div>
 
-          {/* ── Centre: transparent, shows 3D canvas ── */}
-          <div />
-
           {/* ── Right: Mission telemetry ── */}
-          <div className="flex flex-col justify-center p-8 pointer-events-none">
-            <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-sm overflow-hidden">
+          <div className="flex flex-col justify-center h-full" style={{ paddingRight: 'var(--section-px)', width: 'clamp(280px, 25vw, 360px)' }}>
+            <div
+              className="bg-[#050c12]/80 backdrop-blur-xl border border-[#00f0ff]/10 rounded-sm overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.05)]"
+              style={{ maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}
+            >
 
               {/* Stage image */}
               <AnimatePresence mode="wait">
@@ -263,8 +262,8 @@ export default function TheProcess() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="relative w-full overflow-hidden"
-                  style={{ aspectRatio: '16/9' }}
+                  className="relative w-full overflow-hidden border-b border-white/5"
+                  style={{ height: '160px' }}
                 >
                   {current?.image && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -281,8 +280,8 @@ export default function TheProcess() {
                   />
                   {/* Stage label on image */}
                   <div
-                    className="absolute bottom-2 left-3 font-mono text-[9px] tracking-[0.3em] uppercase"
-                    style={{ color: current?.color ?? '#00f0ff' }}
+                    className="absolute bottom-3 left-4 font-mono text-[10px] tracking-[0.3em] uppercase"
+                    style={{ color: current?.color ?? '#00f0ff', textShadow: '0 0 10px rgba(0,0,0,0.8)' }}
                   >
                     {current?.id} / {current?.codename}
                   </div>
@@ -290,8 +289,9 @@ export default function TheProcess() {
               </AnimatePresence>
 
               {/* Telemetry rows */}
-              <div className="p-5">
-                <div className="font-mono text-[8px] text-[#00f0ff] tracking-[0.4em] uppercase mb-4 pb-2 border-b border-white/10">
+              <div className="p-6">
+                <div className="font-mono text-[9px] text-[#00f0ff] tracking-[0.4em] uppercase mb-4 pb-3 border-b border-white/10 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
                   Mission Status
                 </div>
 
@@ -315,18 +315,18 @@ export default function TheProcess() {
                 </AnimatePresence>
 
                 {/* Live coordinates */}
-                <div className="mt-4 pt-3 border-t border-white/5">
-                  <div className="font-mono text-[8px] text-white/25 tracking-widest">
+                <div className="mt-5 pt-4 border-t border-white/5">
+                  <div className="font-mono text-[9px] text-white/40 tracking-widest">
                     LAT 13.0827° N
                   </div>
-                  <div className="font-mono text-[8px] text-white/25 tracking-widest mt-0.5">
+                  <div className="font-mono text-[9px] text-white/40 tracking-widest mt-1">
                     LON 80.2707° E
                   </div>
                   <div
-                    className="font-mono text-[8px] tracking-widest mt-2 animate-pulse"
+                    className="font-mono text-[9px] tracking-[0.2em] mt-3 animate-pulse uppercase"
                     style={{ color: stage >= 0 ? "#00ff88" : "#ffffff22" }}
                   >
-                    {stage >= 0 ? "● SYSTEM ACTIVE" : "○ AWAITING"}
+                    {stage >= 0 ? "● SYSTEM ACTIVE" : "○ AWAITING DEPLOYMENT"}
                   </div>
                 </div>
               </div>
@@ -342,7 +342,7 @@ export default function TheProcess() {
                   transition={{ duration: 0.5 }}
                   className="mt-4 bg-[#ff4444]/10 border border-[#ff4444]/40 p-4 rounded-sm text-center"
                 >
-                  <div className="font-mono text-[9px] text-[#ff4444] tracking-[0.3em] uppercase">
+                  <div className="font-mono text-[10px] text-[#ff4444] tracking-[0.3em] uppercase">
                     FROM IDEA → AUTONOMY
                   </div>
                 </motion.div>

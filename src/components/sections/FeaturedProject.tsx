@@ -161,8 +161,8 @@ export default function FeaturedProject() {
       {/* HTML Overlays */}
       <div className="relative z-20 w-full h-full pointer-events-none">
         
-        {/* Dynamic HUD Grid (Always visible on top) */}
-        <div className="fixed md:absolute top-12 right-6 md:top-32 md:right-12 font-mono text-[10px] md:text-xs text-[#00f0ff] opacity-70 tracking-widest text-right pointer-events-none z-30">
+        {/* Dynamic HUD Grid (Top Right) */}
+        <div className="absolute top-[128px] spx-r font-mono text-[10px] md:text-xs text-[#00f0ff] opacity-70 tracking-widest text-right pointer-events-none z-30">
           <div className="mb-2">LAT 13.0827° N</div>
           <div className="mb-2">LON 80.2707° E</div>
           <div className="mb-2">SPD {hudData.speed} m/s</div>
@@ -170,73 +170,73 @@ export default function FeaturedProject() {
           <div>OBS {hudData.obstacles.toString().padStart(2, '0')}</div>
         </div>
 
-        {/* Desktop Split Layout / Mobile Vertical Scroll Container */}
-        <div className="container mx-auto h-full flex flex-col md:flex-row relative z-20">
+        {/* ─── TOP LEFT: Title & Intro ─── */}
+        <div className="absolute top-[128px] spx-l w-[calc(100%-2rem)] md:max-w-md pointer-events-auto">
           
-          {/* Left Content */}
-          <div className="w-full md:w-1/3 px-6 md:px-12 flex flex-col justify-start pointer-events-auto h-full overflow-y-visible relative" style={{ paddingTop: '128px' }}>
-            
-            <div className="md:static">
-              {/* Section Marker */}
-              <div className="flex items-center gap-4 mb-6 opacity-50">
-                <span className="text-white/40 font-mono text-sm tracking-widest">04</span>
-                <div className="w-16 h-px bg-white/20" />
-                <span className="text-[#00f0ff] font-mono text-sm uppercase tracking-[0.3em]">03 / FEATURED</span>
-              </div>
-
-              {/* Title */}
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tighter mb-6 uppercase">
-                Autonomous Robotics, <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">Built to Move.</span>
-              </h2>
-
-              <p className="text-white/60 text-sm md:text-base font-light leading-relaxed mb-8 max-w-sm">
-                An autonomous mobile robot designed to navigate dynamic environments, detect obstacles, and make intelligent movement decisions in real time.
-              </p>
-
-              {/* HUD Status Alerts (Triggered by GSAP) */}
-              <div ref={hudSystemRef} className="flex flex-col gap-2 font-mono text-[10px] tracking-widest text-green-400 mb-8 border-l border-green-400/50 pl-4">
-                <div>SYSTEM: ONLINE</div>
-                <div>AI: ACTIVE</div>
-                <div>VISION: ACTIVE</div>
-                <div className="animate-pulse text-[#00f0ff]">LIDAR: SCANNING</div>
-              </div>
-
-              {/* Tech Stack (Triggered by GSAP during recalculation) */}
-              <div ref={techStackRef} className="flex flex-wrap gap-2 mb-12">
-                {['ROS 2', 'Python', 'Computer Vision', 'LiDAR', 'AI'].map(tech => (
-                  <span key={tech} className="px-3 py-1 bg-[#00f0ff]/10 border border-[#00f0ff]/20 text-[#00f0ff] font-mono text-[10px] uppercase tracking-wider rounded-sm">
-                    {tech}
-                  </span>
-                ))}
-                <div className="w-full mt-2 text-[#ff0044] font-mono text-[10px] tracking-widest animate-pulse border border-[#ff0044]/30 px-3 py-1 bg-[#ff0044]/10 inline-block rounded-sm">
-                  OBSTACLE AVOIDANCE ENGAGED
-                </div>
-              </div>
-
-              {/* Mission Complete (Triggered by GSAP at end) */}
-              <div ref={hudMissionRef} className="w-full max-w-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30 p-4 rounded-sm backdrop-blur-md mb-8 text-center shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-                <div className="text-white font-bold tracking-widest uppercase mb-1 text-sm">Mission Complete</div>
-                <div className="text-[#00f0ff] font-mono text-[10px] tracking-widest">AUTONOMOUS NAVIGATION — SUCCESS</div>
-              </div>
-
-              {/* Button */}
-              <div ref={btnRef}>
-                <a href="#case-study" className="group inline-flex items-center gap-4 px-6 py-3 bg-white text-black font-bold text-xs uppercase tracking-widest rounded hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] hover:bg-[#00f0ff] transition-all duration-300">
-                  <span>View Case Study</span>
-                  <svg className="w-4 h-4 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
-              </div>
-
-            </div>
+          {/* Section Marker */}
+          <div className="section-label">
+            <span className="section-label-num">04</span>
+            <div className="section-label-divider" />
+            <span className="section-label-text">03 / FEATURED</span>
           </div>
-          
-          {/* Right side blank to allow 3D visibility */}
-          <div className="hidden md:block w-2/3 h-full pointer-events-none" />
+
+          {/* Title */}
+          <h2 className="section-heading">
+            Autonomous Robotics,<br/>
+            <span className="heading-gradient">Built to Move.</span>
+          </h2>
+
+          {/* Description */}
+          <p className="section-body mb-10">
+            An autonomous mobile robot designed to navigate dynamic environments, detect obstacles, and make intelligent movement decisions in real time.
+          </p>
 
         </div>
+
+        {/* ─── BOTTOM LEFT: HUD Status Alerts ─── */}
+        <div className="absolute bottom-12 spx-l pointer-events-auto z-30 hidden md:block">
+          <div ref={hudSystemRef} className="flex flex-col gap-3 font-mono text-[10px] tracking-[0.2em] text-[#00ff88] border-l-[2px] border-[#00ff88]/30 pl-5">
+            <div className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"></span>SYSTEM: ONLINE</div>
+            <div className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"></span>AI: ACTIVE</div>
+            <div className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"></span>VISION: ACTIVE</div>
+            <div className="flex items-center gap-3 text-[#00f0ff] animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff]"></span>LIDAR: SCANNING</div>
+          </div>
+        </div>
+
+        {/* ─── BOTTOM RIGHT: Tech Stack ─── */}
+        <div className="absolute bottom-12 spx-r pointer-events-auto z-30 hidden md:flex flex-col items-end">
+          <div ref={techStackRef} className="flex flex-wrap justify-end gap-3 max-w-sm">
+            {['ROS 2', 'Python', 'Computer Vision', 'LiDAR', 'AI'].map(tech => (
+              <span key={tech} className="px-4 py-1.5 bg-[#00f0ff]/5 border border-[#00f0ff]/20 text-[#00f0ff] font-mono text-[9px] uppercase tracking-[0.2em]">
+                {tech}
+              </span>
+            ))}
+            <div className="w-full mt-3 text-[#ff0044] font-mono text-[9px] tracking-[0.2em] animate-pulse border border-[#ff0044]/30 px-4 py-2 bg-[#ff0044]/10 inline-block uppercase text-right">
+              OBSTACLE AVOIDANCE ENGAGED
+            </div>
+          </div>
+        </div>
+
+        {/* ─── TOP CENTER: Mission Complete & CTA ─── */}
+        <div className="absolute top-[128px] left-1/2 transform -translate-x-1/2 flex flex-col items-center pointer-events-auto z-40 w-[90%] md:w-auto">
+          
+          {/* Mission Complete */}
+          <div ref={hudMissionRef} className="w-full min-w-[300px] bg-[#00f0ff]/5 border border-[#00f0ff]/20 p-6 backdrop-blur-md mb-8 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent opacity-50" />
+            <div className="text-white font-bold tracking-[0.2em] uppercase mb-2 text-sm md:text-base">Mission Complete</div>
+            <div className="text-[#00f0ff] font-mono text-[9px] md:text-[10px] tracking-[0.3em]">AUTONOMOUS NAVIGATION — SUCCESS</div>
+          </div>
+
+          {/* Button */}
+          <div ref={btnRef}>
+            <a href="#case-study" className="group inline-flex items-center gap-4 px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em] hover:bg-[#00f0ff] transition-all duration-300">
+              <span>View Case Study</span>
+              <span className="font-mono transform group-hover:translate-x-2 transition-transform duration-300">→</span>
+            </a>
+          </div>
+
+        </div>
+
       </div>
       
       {/* Mobile spacer to force scroll height */}

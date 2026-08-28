@@ -144,81 +144,77 @@ export default function TechnologyStack() {
         </Canvas>
       </div>
 
-      {/* DESKTOP LAYOUT */}
-      <div className="hidden md:flex flex-col container mx-auto px-6 lg:px-12 pt-32 pb-16 relative z-20 min-h-[100svh] justify-between pointer-events-none">
-        
-        {/* Header - Fixed format and more breathing space */}
-        <div ref={headingRef} className="w-full text-center mb-24">
-          <div className="flex items-center justify-center gap-4 mb-6 opacity-50">
-            <div className="w-16 h-px bg-white/20" />
-            <span className="text-[#00f0ff] font-mono text-sm uppercase tracking-[0.3em]">04 / TECHNOLOGY</span>
-            <div className="w-16 h-px bg-white/20" />
+      {/* DESKTOP LAYOUT — all 4 categories fit within 100vh using absolute positioning */}
+      <div
+        className="hidden md:block relative z-20 pointer-events-none"
+        style={{ height: '100svh', overflow: 'hidden' }}
+      >
+        {/* Header — compact, top-center */}
+        <div
+          ref={headingRef}
+          className="absolute left-1/2 text-center pointer-events-none"
+          style={{ top: '88px', transform: 'translateX(-50%)', width: '100%', maxWidth: '700px' }}
+        >
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="w-10 h-px bg-white/15" />
+            <span className="font-mono text-[11px] text-[#00f0ff] uppercase tracking-[0.3em]">04 / TECHNOLOGY</span>
+            <div className="w-10 h-px bg-white/15" />
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-6">
+          <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.5rem)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', lineHeight: 1.05, color: '#fff', marginBottom: '0.75rem' }}>
             The Technology <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">Behind the Intelligence.</span>
+            <span className="heading-gradient">Behind the Intelligence.</span>
           </h2>
-          <p className="text-white/60 font-light max-w-xl mx-auto">
-            From low-level hardware control to high-level AI, I work with a modern robotics stack to turn complex ideas into functional systems.
+          <p style={{ fontSize: '13px', fontWeight: 300, lineHeight: 1.7, color: 'rgba(255,255,255,0.45)', maxWidth: '28rem', margin: '0 auto' }}>
+            From hardware control to high-level AI — a modern robotics stack.
           </p>
         </div>
 
-        {/* Categories / Scroll Targets */}
-        <div className="grid grid-cols-2 gap-y-72 justify-between w-full h-full flex-grow mt-12 pointer-events-auto relative">
-          
-          {/* Top Left (Vision) */}
-          <div ref={(el) => { categoryRefs.current[0] = el; }} className="self-start">
-            <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
-              <span className="text-lg">👁️</span> AI & Vision
-            </h3>
-            <p className="text-xl font-bold tracking-wider">OpenCV · ML · Deep Learning</p>
-            <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">
-              SCANNING ENVIRONMENT...
-            </div>
-          </div>
+        {/* TOP-LEFT */}
+        <div ref={(el) => { categoryRefs.current[0] = el; }} className="absolute spx-l pointer-events-auto" style={{ top: '42%' }}>
+          <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
+            <span>👁️</span> AI &amp; Vision
+          </h3>
+          <p className="text-lg font-bold tracking-wider">OpenCV · ML · Deep Learning</p>
+          <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">SCANNING ENVIRONMENT...</div>
+        </div>
 
-          {/* Top Right (Programming) */}
-          <div ref={(el) => { categoryRefs.current[1] = el; }} className="self-start text-right">
-            <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center justify-end gap-2">
-              Programming <span className="text-lg text-white/70">{"{ }"}</span>
-            </h3>
-            <p className="text-xl font-bold tracking-wider">Python · C++ · JavaScript</p>
-            <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">
-              DATA PROCESSING...
-            </div>
-          </div>
+        {/* TOP-RIGHT */}
+        <div ref={(el) => { categoryRefs.current[1] = el; }} className="absolute spx-r text-right pointer-events-auto" style={{ top: '42%' }}>
+          <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center justify-end gap-2">
+            Programming <span className="text-white/70">{"{ }"}</span>
+          </h3>
+          <p className="text-lg font-bold tracking-wider">Python · C++ · JavaScript</p>
+          <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">DATA PROCESSING...</div>
+        </div>
 
-          {/* Bottom Left (Hardware) */}
-          <div ref={(el) => { categoryRefs.current[2] = el; }} className="self-end">
-            <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
-              <span className="text-lg text-white/70">▣</span> Hardware
-            </h3>
-            <p className="text-xl font-bold tracking-wider">Arduino · Pi · Jetson · Sensors</p>
-            <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">
-              COMPONENTS ONLINE
-            </div>
-          </div>
+        {/* BOTTOM-LEFT */}
+        <div ref={(el) => { categoryRefs.current[2] = el; }} className="absolute spx-l pointer-events-auto" style={{ bottom: '10%' }}>
+          <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
+            <span className="text-white/70">▣</span> Hardware
+          </h3>
+          <p className="text-lg font-bold tracking-wider">Arduino · Pi · Jetson · Sensors</p>
+          <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">COMPONENTS ONLINE</div>
+        </div>
 
-          {/* Bottom Right (Robotics) */}
-          <div ref={(el) => { categoryRefs.current[3] = el; }} className="self-end text-right">
-            <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center justify-end gap-2">
-              Robotics <span className="text-lg">🦾</span>
-            </h3>
-            <p className="text-xl font-bold tracking-wider">ROS · ROS 2 · Gazebo · MoveIt</p>
-            <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">
-              ACTUATORS ENGAGED
-            </div>
-          </div>
+        {/* BOTTOM-RIGHT */}
+        <div ref={(el) => { categoryRefs.current[3] = el; }} className="absolute spx-r text-right pointer-events-auto" style={{ bottom: '10%' }}>
+          <h3 className="text-[#00f0ff] font-mono text-xs uppercase tracking-widest mb-2 flex items-center justify-end gap-2">
+            Robotics <span>🦾</span>
+          </h3>
+          <p className="text-lg font-bold tracking-wider">ROS · ROS 2 · Gazebo · MoveIt</p>
+          <div className="text-white/40 font-mono text-[10px] mt-2 border border-white/10 px-2 py-1 inline-block bg-white/5 rounded-sm">ACTUATORS ENGAGED</div>
+        </div>
 
-          {/* System Status Center Overlay */}
-          <div ref={systemStatusRef} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-16 pointer-events-none">
-            <div className="px-6 py-2 bg-[#00f0ff]/10 border border-[#00f0ff]/40 rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-              <span className="text-[#00f0ff] font-mono text-xs tracking-[0.3em] uppercase">System Connected</span>
-            </div>
+        {/* System Status centre */}
+        <div ref={systemStatusRef} className="absolute left-1/2 pointer-events-none" style={{ top: '50%', transform: 'translate(-50%, -50%)' }}>
+          <div className="px-6 py-2 bg-[#00f0ff]/10 border border-[#00f0ff]/40 rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+            <span className="text-[#00f0ff] font-mono text-xs tracking-[0.3em] uppercase">System Connected</span>
           </div>
-
         </div>
       </div>
+
+
+
 
 
       {/* MOBILE LAYOUT (Vertical Scroll) */}

@@ -173,11 +173,12 @@ export default function Expertise() {
     return () => mm.revert(); // Cleanup matchMedia
   }, { scope: sectionRef, dependencies: [isMounted] });
 
-  const Card = ({ refObj, num, title, desc, onHover, onLeave, alignClass }: any) => (
+  const Card = ({ refObj, num, title, desc, onHover, onLeave, alignClass, style }: any) => (
     <div 
       ref={refObj} 
       onMouseEnter={onHover} 
       onMouseLeave={onLeave}
+      style={style}
       className={`w-[85vw] max-w-sm md:w-72 p-6 md:p-8 backdrop-blur-md bg-black/60 border border-white/10 hover:border-[#00f0ff]/50 transition-colors duration-300 mx-auto md:mx-0 ${alignClass}`}
     >
       <div className="text-[#00f0ff] font-mono text-xs tracking-widest mb-2 md:mb-4">{num}</div>
@@ -217,22 +218,32 @@ export default function Expertise() {
       <div className="relative z-20 w-full md:h-[100svh] md:pointer-events-none">
         <div className="container mx-auto relative md:h-full flex flex-col md:block">
           
-          {/* Mobile Intro Header */}
-          <div className="md:absolute top-32 left-6 md:left-12 pt-24 pb-48 md:pt-0 md:pb-0 px-6 md:px-0">
-            <div className="flex items-center gap-4 opacity-50 mb-8 md:mb-0">
-              <span className="text-white/40 font-mono text-sm tracking-widest">03</span>
-              <div className="w-16 h-px bg-white/20" />
-              <span className="text-[#00f0ff] font-mono text-sm uppercase tracking-[0.3em]">02 / EXPERTISE</span>
+          {/* Desktop: Section label + short description — top-left */}
+          <div className="hidden md:block md:absolute spx-l pointer-events-none" style={{ top: '128px' }}>
+            <div className="section-label mb-1">
+              <span className="section-label-num">03</span>
+              <div className="section-label-divider" />
+              <span className="section-label-text">02 / EXPERTISE</span>
             </div>
-            
-            <div className="md:hidden mt-8 mb-12">
-              <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-tight">
+            <p className="section-body" style={{ fontSize: '11px', lineHeight: '1.6', maxWidth: '180px', opacity: 0.4 }}>
+              Robotics · AI · Automation
+            </p>
+          </div>
+
+          {/* Mobile: Full scrollable header (label + title + description) */}
+          <div className="md:hidden pt-24 pb-48 px-6">
+            <div className="section-label">
+              <span className="section-label-num">03</span>
+              <div className="section-label-divider" />
+              <span className="section-label-text">02 / EXPERTISE</span>
+            </div>
+            <div className="mt-6 mb-10">
+              <h2 className="section-heading">
                 Where Intelligence <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-white/50">Meets Engineering.</span>
+                <span className="heading-cyan">Meets Engineering.</span>
               </h2>
             </div>
-
-            <p className="text-white/50 text-sm font-light max-w-sm mt-4 md:mt-12 md:absolute md:top-12">
+            <p className="section-body">
               I work across robotics, artificial intelligence, and automation to create systems that are smarter, faster, and more autonomous.
             </p>
           </div>
@@ -242,25 +253,32 @@ export default function Expertise() {
             <Card 
               refObj={card1Ref} num="01" title="AI & Robotics" 
               desc="Building intelligent robots capable of perception, decision-making, and adaptive behavior."
-              alignClass="md:absolute md:top-[25%] md:left-[5%]" 
+              alignClass="md:absolute spx-l" 
+              style={{ top: '22%' }}
               onHover={() => setHoveredNode(1)} onLeave={() => setHoveredNode(null)}
             />
+            {/* Card 2 — top RIGHT, same row as Card 1 */}
             <Card 
               refObj={card2Ref} num="02" title="Computer Vision" 
               desc="Giving robots the ability to see, identify, track, and understand their surroundings."
-              alignClass="md:absolute md:top-[25%] md:right-[5%]" 
+              alignClass="md:absolute spx-r" 
+              style={{ top: '22%' }}
               onHover={() => setHoveredNode(2)} onLeave={() => setHoveredNode(null)}
             />
+            {/* Card 3 — bottom LEFT, same row as Card 4 */}
             <Card 
               refObj={card3Ref} num="03" title="Autonomous Systems" 
               desc="Developing robots that can navigate, plan, and operate with minimal human intervention."
-              alignClass="md:absolute md:bottom-[15%] md:left-[5%]" 
+              alignClass="md:absolute spx-l" 
+              style={{ bottom: '10%' }}
               onHover={() => setHoveredNode(3)} onLeave={() => setHoveredNode(null)}
             />
+            {/* Card 4 — bottom RIGHT, same row as Card 3 */}
             <Card 
               refObj={card4Ref} num="04" title="Robotics Automation" 
               desc="Designing automated robotic workflows for industrial and real-world applications."
-              alignClass="md:absolute md:bottom-[15%] md:right-[5%]" 
+              alignClass="md:absolute spx-r" 
+              style={{ bottom: '10%' }}
               onHover={() => setHoveredNode(4)} onLeave={() => setHoveredNode(null)}
             />
           </div>
