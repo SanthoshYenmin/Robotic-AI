@@ -1,38 +1,50 @@
 "use client";
 
-import { ReactLenis, useLenis } from "lenis/react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import Lenis from "lenis";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function ScrollReset() {
-  const pathname = usePathname();
-  const lenis = useLenis();
-
-  useEffect(() => {
-    if (lenis) {
-      lenis.scrollTo(0, { immediate: true });
-    }
-    window.scrollTo(0, 0);
-  }, [pathname, lenis]);
-
-  return null;
-}
-
 export default function SmoothScroller({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.07,
+      smoothWheel: true,
+      syncTouch: true,
+      autoRaf: false,
+    });
+
+    lenis.on("scroll", ScrollTrigger.update);
+
+    const ticker = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(ticker);
+    gsap.ticker.lagSmoothing(0);
+
+    // Refresh on window load for first-visit reliability
+    const onLoad = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("load", onLoad);
+
     return () => {
+      lenis.off("scroll", ScrollTrigger.update);
+      gsap.ticker.remove(ticker);
+      window.removeEventListener("load", onLoad);
+      lenis.destroy();
       ScrollTrigger.killAll();
     };
   }, []);
 
-  return (
-    <ReactLenis root options={{ lerp: 0.05, smoothWheel: true }}>
-      <ScrollReset />
-      {children}
-    </ReactLenis>
-  );
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const timeout = setTimeout(() => ScrollTrigger.refresh(), 150);
+    return () => clearTimeout(timeout);
+  }, [pathname]);
+
+  return <>{children}</>;
 }
