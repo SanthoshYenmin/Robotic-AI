@@ -1,112 +1,39 @@
 "use client";
 
-import { useRef, Suspense, useMemo, useState, useEffect } from "react";
+import { useRef, Suspense, useState, useEffect } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useVideoTexture } from "@react-three/drei";
-import * as THREE from "three";
+
+// WebGL Video removed in favor of high-performance native HTML Video with CSS filters
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Custom 3D WebGL Video Background with HUD Shader Effects
-function VideoBackground() {
-  // Load the video as a texture
-  const texture = useVideoTexture("/videos/hero-banner.mp4", {
-    muted: true,
-    loop: true,
-    start: true,
-    crossOrigin: "Anonymous"
-  });
-  
-  const { viewport } = useThree();
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  const uniforms = useMemo(() => ({
-    tDiffuse: { value: texture },
-    time: { value: 0 }
-  }), [texture]);
-
-  useFrame((state) => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.time.value = state.clock.elapsedTime;
-    }
-  });
-
-  // Calculate object-cover sizing
-  const videoAspect = 1920 / 1080;
-  const screenAspect = viewport.width / viewport.height;
-  
-  let scaleX = viewport.width;
-  let scaleY = viewport.height;
-  
-  if (screenAspect > videoAspect) {
-    scaleY = viewport.width / videoAspect;
-  } else {
-    scaleX = viewport.height * videoAspect;
-  }
-
-  return (
-    <mesh scale={[scaleX, scaleY, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        ref={materialRef}
-        transparent
-        uniforms={uniforms}
-        vertexShader={`
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `}
-        fragmentShader={`
-          uniform sampler2D tDiffuse;
-          uniform float time;
-          varying vec2 vUv;
-
-          void main() {
-            vec2 p = vUv;
-
-            // Chromatic aberration (RGB shift)
-            float shift = sin(time * 5.0) * 0.003;
-            
-            // Slow wave distortion
-            float wave = sin(p.y * 50.0 + time * 5.0) * 0.002;
-            
-            vec4 cr = texture2D(tDiffuse, p + vec2(shift + wave, 0.0));
-            vec4 cga = texture2D(tDiffuse, p + vec2(wave, 0.0));
-            vec4 cb = texture2D(tDiffuse, p - vec2(shift - wave, 0.0));
-
-            vec4 color = vec4(cr.r, cga.g, cb.b, cga.a);
-
-            // Subtle scanlines
-            float scanline = sin(p.y * 1000.0) * 0.03;
-            color.rgb -= scanline;
-            
-            // Neon cyan tint for HUD feel
-            color.b += 0.05;
-            color.g += 0.02;
-
-            gl_FragColor = color;
-          }
-        `}
-      />
-    </mesh>
-  );
-}
-
 export default function Hero() {
-  const [isMounted, setIsMounted] = useState(false);
+  // Wait until Preloader completes and unlocks body scroll
+  const [isReady, setIsReady] = useState(() => !!(window as any).preloaderFinished);
 
   useEffect(() => {
-    setIsMounted(true);
+    if ((window as any).preloaderFinished) {
+      setIsReady(true);
+      return;
+    }
+    const handleReady = () => setIsReady(true);
+    window.addEventListener("preloaderComplete", handleReady);
+    return () => window.removeEventListener("preloaderComplete", handleReady);
   }, []);
+
+  // Audio states
+  const [isGlobalMuted, setIsGlobalMuted] = useState(true);
+  // Track if Hero is in view for audio using GSAP
+  const [isInView, setIsInView] = useState(true);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
-  const maskRef = useRef<SVGSVGElement>(null);
+  const maskRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
@@ -115,7 +42,7 @@ export default function Hero() {
   const gridRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (!isMounted) return;
+    if (!isReady) return;
     const pin = pinRef.current;
     const mask = maskRef.current;
     if (!pin || !mask) return;
@@ -126,25 +53,21 @@ export default function Hero() {
         start: "top top",
         end: "+=2200",
         pin: true,
-        scrub: 2,
-        preventOverlaps: true,
-        fastScrollEnd: true,
+        scrub: 1.5,
         refreshPriority: 11,
+        onEnter: () => setIsInView(true),
+        onLeave: () => setIsInView(false),
+        onEnterBack: () => setIsInView(true),
+        onLeaveBack: () => setIsInView(false),
       }
-    }).to(mask, { scale: 100, transformOrigin: "center center", ease: "power2.inOut", duration: 1 })
+    })
+      .to(mask, { scale: 100, transformOrigin: "center center", ease: "power2.inOut", duration: 1 })
       .set(mask, { display: "none" })
-      .to({}, { duration: 1 }); // Empty tween to keep the section pinned while video plays
-
-    const t1 = setTimeout(() => ScrollTrigger.refresh(), 400);
-    const t2 = setTimeout(() => ScrollTrigger.refresh(), 1000);
-    const onLoad = () => ScrollTrigger.refresh();
-    window.addEventListener("load", onLoad);
-
-    return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener("load", onLoad); };
-  }, { scope: containerRef, dependencies: [isMounted] });
+      .to(mask, { opacity: 0, duration: 1 }); // Safe padding tween
+  }, { scope: containerRef, dependencies: [isReady] });
 
   useGSAP(() => {
-    if (!isMounted) return;
+    if (!isReady) return;
     const content = contentRef.current;
     if (!content) return;
 
@@ -170,29 +93,59 @@ export default function Hero() {
       .to(headingRef.current, { opacity: 1, y: 0, skewY: 0, duration: 1.5 })
       .to(descRef.current, { opacity: 1, y: 0, duration: 1 })
       .to(statsRef.current, { opacity: 1, y: 0, duration: 1 });
-  }, { scope: containerRef, dependencies: [isMounted] });
+  }, { scope: containerRef, dependencies: [isReady] });
 
   return (
     <div ref={containerRef} className="relative w-full">
       {/* PHASE 1: NOVA ZOOM */}
       <div className="w-full">
         <div ref={pinRef} className="relative w-full h-[100svh] bg-black overflow-hidden rounded-b-3xl md:rounded-b-[3rem] z-10">
-          
-          {/* R3F WebGL Video Background */}
-          <div className="absolute inset-0 w-full h-full opacity-60 z-0">
-            {isMounted && (
-              <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-                <Suspense fallback={null}>
-                  <VideoBackground />
-                </Suspense>
-              </Canvas>
-            )}
+
+          {/* High-Performance Native Video Background */}
+          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden bg-black">
+            <video
+              src="/videos/hero-banner.mp4"
+              autoPlay
+              loop
+              playsInline
+              preload="auto"
+              muted={isGlobalMuted || !isInView}
+              onTimeUpdate={(e) => {
+                const video = e.currentTarget;
+                // If we are extremely close to the end, jump back to avoid the MP4 freeze frame
+                // This is a known browser bug with MP4 audio/video track length mismatches
+                if (video.duration && video.currentTime >= video.duration - 0.2) {
+                  video.currentTime = 0.1;
+                  video.play().catch(() => { });
+                }
+              }}
+              className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 opacity-60"
+            />
+            {/* Extremely Lightweight CSS Cyan Tint Overlay */}
+            <div className="absolute inset-0 w-full h-full bg-[#00f0ff] opacity-10 mix-blend-color pointer-events-none" />
+
+            {/* CSS Scanlines Overlay */}
+            <div
+              className="absolute inset-0 w-full h-full pointer-events-none opacity-30 mix-blend-overlay"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.8) 2px, rgba(0,0,0,0.8) 4px)'
+              }}
+            />
           </div>
-          
+
+          {/* Audio Toggle Button - Inside pinRef so it scrolls away with the video */}
+          <button
+            onClick={() => setIsGlobalMuted(!isGlobalMuted)}
+            className="absolute top-32 right-8 md:right-16 z-[100] w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 pointer-events-auto cursor-pointer"
+            aria-label="Toggle Audio"
+          >
+            {isGlobalMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </button>
+
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-0 pointer-events-none" />
 
-          <div className="absolute inset-0 z-10 pointer-events-none">
-            <svg ref={maskRef} width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
+          <div ref={maskRef} className="absolute inset-0 z-10 pointer-events-none origin-center">
+            <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
               <defs>
                 <mask id="nova-mask">
                   <rect width="1000" height="1000" fill="white" />
@@ -242,7 +195,7 @@ export default function Hero() {
 
             {/* HUD Label */}
             <div ref={descRef} className="absolute top-[40%] right-8 md:right-16 lg:right-24 w-full max-w-[240px] hidden md:block z-20">
-              <div 
+              <div
                 style={{ padding: '1.5rem' }}
                 className="relative border border-[#00f0ff]/30 bg-[#00f0ff]/10 backdrop-blur-md overflow-hidden group shadow-[0_0_20px_rgba(0,240,255,0.15)] rounded-sm"
               >

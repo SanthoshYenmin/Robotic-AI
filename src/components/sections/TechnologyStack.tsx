@@ -1,4 +1,5 @@
-import { useRef, useState, useEffect, Suspense } from "react";
+import { useRef, Suspense } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -17,11 +18,7 @@ const techCategories = [
 export default function TechnologyStack() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = usePreloaderReady();
   
   const textElementsRef = useRef<(HTMLDivElement | null)[]>([]);
 

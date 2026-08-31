@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, Suspense } from "react";
+import { useRef, useState, Suspense, useEffect } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -14,7 +15,7 @@ export default function Expertise() {
   const sectionRef = useRef<HTMLElement>(null);
   const treeRef = useRef<ExpertiseTreeRef>(null);
   
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = usePreloaderReady();
   const [treeLoaded, setTreeLoaded] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<number | null>(null);
 
@@ -210,7 +211,7 @@ export default function Expertise() {
           backgroundSize: "60px 60px"
         }} />
 
-        <Canvas camera={{ position: [0, 0, 7], fov: 50 }} gl={{ alpha: true, antialias: true }} onCreated={() => setIsMounted(true)}>
+        <Canvas camera={{ position: [0, 0, 7], fov: 50 }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
             {isMounted && <ExpertiseTree ref={treeRef} hoveredNode={hoveredNode} onReady={() => setTreeLoaded(true)} />}
           </Suspense>

@@ -2,7 +2,6 @@
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Environment, ContactShadows } from "@react-three/drei";
 import { Model as RealRobotModel } from "@/components/three/RobotModel";
 
 type BuildLabProps = {
@@ -131,7 +130,6 @@ function AnimatedRobot({ progressRef }: { progressRef: React.MutableRefObject<{ 
   return (
     <group ref={groupRef} position={[0, -1.5, 0]}>
       <RealRobotModel rotation={[Math.PI / 2, 0, 0]} />
-      <ContactShadows resolution={512} scale={10} blur={2} opacity={0.5} far={5} color="#000000" />
       {/* Intense glow at the core */}
       <pointLight color="#00f0ff" intensity={3} distance={4} position={[0, 1.5, 1]} />
     </group>
@@ -142,13 +140,13 @@ function AnimatedRobot({ progressRef }: { progressRef: React.MutableRefObject<{ 
 export default function BuildLab({ progressRef }: BuildLabProps) {
   return (
     <>
-      <ambientLight intensity={0.3} color="#051020" />
-      <directionalLight position={[5, 10, 5]} intensity={0.4} color="#ffffff" castShadow />
-      <pointLight position={[-8, 5, 2]} intensity={1.2} color="#00f0ff" />
-      <pointLight position={[8, -5, -2]} intensity={0.8} color="#00ff88" />
+      {/* Force the WebGL background to be dark */}
+      <color attach="background" args={["#020810"]} />
       
-      {/* Realism for PBR Materials without bright sky glare */}
-      <Environment preset="studio" blur={0.5} />
+      <ambientLight intensity={0.6} color="#051020" />
+      <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffffff" castShadow />
+      <pointLight position={[-8, 5, 2]} intensity={1.5} color="#00f0ff" />
+      <pointLight position={[8, -5, -2]} intensity={1.0} color="#00ff88" />
 
       <BackgroundGrid />
       <ScannerRing progressRef={progressRef} />

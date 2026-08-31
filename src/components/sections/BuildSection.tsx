@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState, lazy, Suspense, useEffect } from "react";
+import { useRef, useState, lazy, Suspense } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -59,11 +60,7 @@ export default function BuildSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [stage, setStage] = useState(-1);
   const progressRef = useRef({ value: 0 });
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = usePreloaderReady();
 
   useGSAP(() => {
     if (!isMounted) return;
@@ -91,11 +88,11 @@ export default function BuildSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen bg-[#020810] text-white overflow-hidden"
+      className="relative w-full h-screen bg-black text-white overflow-hidden"
     >
       {/* ── Background: 3D Scene ── */}
-      <div className="absolute inset-0 z-0 bg-[#020810]">
-        <Suspense fallback={<div className="absolute inset-0 bg-[#020810]" />}>
+      <div className="absolute inset-0 z-0 bg-black">
+        <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
           <BuildCanvas progressRef={progressRef} />
         </Suspense>
       </div>
@@ -119,7 +116,7 @@ export default function BuildSection() {
             animate={{ opacity: 0.88 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="absolute inset-0 bg-[#020810] z-20 pointer-events-none"
+            className="absolute inset-0 bg-black z-20 pointer-events-none"
           />
         )}
       </AnimatePresence>

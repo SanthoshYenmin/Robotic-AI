@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect, Suspense } from "react";
+import { useRef, Suspense, useState } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -113,11 +114,7 @@ function TelRow({ label, value }: { label: string; value: string }) {
 export default function TheProcess() {
   const sectionRef = useRef<HTMLElement>(null);
   const [stage, setStage] = useState(-1); // -1 = before entering
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = usePreloaderReady();
 
   const progressRef = useRef({ value: 0 });
 

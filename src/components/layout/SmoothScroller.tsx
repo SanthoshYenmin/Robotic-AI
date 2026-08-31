@@ -12,6 +12,12 @@ export default function SmoothScroller({ children }: { children: React.ReactNode
   const { pathname } = useLocation();
 
   useEffect(() => {
+    // Disable native scroll restoration to prevent GSAP trigger mismatches on refresh
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    ScrollTrigger.clearScrollMemory("manual");
+
     const lenis = new Lenis({
       lerp: 0.07,
       smoothWheel: true,
@@ -52,13 +58,12 @@ export default function SmoothScroller({ children }: { children: React.ReactNode
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const t1 = setTimeout(() => ScrollTrigger.refresh(), 150);
+    const t1 = setTimeout(() => ScrollTrigger.refresh(), 100);
     const t2 = setTimeout(() => ScrollTrigger.refresh(), 500);
-    const t3 = setTimeout(() => ScrollTrigger.refresh(), 1000);
+    
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, [pathname]);
 

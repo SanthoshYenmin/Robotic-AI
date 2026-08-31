@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -20,7 +21,7 @@ export default function Introduction() {
   const scanLineRef = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = usePreloaderReady();
 
   useGSAP(() => {
     const section = sectionRef.current;
@@ -144,7 +145,7 @@ export default function Introduction() {
 
       {/* 3D Canvas Background */}
       <div className="absolute inset-0 z-10">
-        <Canvas camera={{ position: [0, 0, 5], fov: 50 }} onCreated={() => setIsMounted(true)}>
+        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
           <RoboticCore ref={coreRef} />
         </Canvas>
       </div>

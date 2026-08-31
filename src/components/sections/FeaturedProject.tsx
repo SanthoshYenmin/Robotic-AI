@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, Suspense } from "react";
+import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -13,7 +14,7 @@ export default function FeaturedProject() {
   const sectionRef = useRef<HTMLElement>(null);
   const roverComponentRef = useRef<AutonomousRoverRef>(null);
   
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = usePreloaderReady();
   const [modelLoaded, setModelLoaded] = useState(false);
   
   // HTML Refs
@@ -153,7 +154,7 @@ export default function FeaturedProject() {
       
       {/* 3D Scene - Sticky for mobile, Absolute for desktop */}
       <div className="sticky top-0 w-full h-[100svh] z-10 md:absolute md:inset-0">
-        <Canvas camera={{ position: [0, 4, 10], fov: 45 }} gl={{ alpha: true, antialias: true }} onCreated={() => setIsMounted(true)}>
+        <Canvas camera={{ position: [0, 4, 10], fov: 45 }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
             {isMounted && <AutonomousRover ref={roverComponentRef} onReady={() => setModelLoaded(true)} />}
           </Suspense>
