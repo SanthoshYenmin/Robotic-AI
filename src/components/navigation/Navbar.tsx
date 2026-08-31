@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState("ABOUT");
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,7 +70,7 @@ export default function Navbar() {
       >
         <div className="container mx-auto spx flex items-center justify-between">
           {/* Left: ROBOTICS */}
-          <Link href="/" className="font-mono text-base md:text-lg tracking-[0.3em] font-bold text-white relative group">
+          <Link to="/" className="font-mono text-base md:text-lg tracking-[0.3em] font-bold text-white relative group">
             <span className="relative z-10 flex items-center gap-2">
               <span className="w-2 h-2 bg-white group-hover:bg-[#00f0ff] transition-colors" />
               ROBOTICS
@@ -86,7 +84,7 @@ export default function Navbar() {
               return (
                 <Link
                   key={link.name}
-                  href={link.href}
+                  to={link.href}
                   onClick={() => handleNavClick(link.name, link.href)}
                   className="group relative font-mono text-xs tracking-[0.25em] transition-colors duration-300 flex items-center gap-2"
                 >
@@ -131,7 +129,7 @@ export default function Navbar() {
                 return (
                   <Link
                     key={link.name}
-                    href={link.href}
+                    to={link.href}
                     className="group flex flex-col items-center gap-4"
                     onClick={() => handleNavClick(link.name, link.href)}
                   >

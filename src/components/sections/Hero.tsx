@@ -99,7 +99,7 @@ function VideoBackground() {
 
 export default function Hero() {
   const [isMounted, setIsMounted] = useState(false);
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -131,8 +131,9 @@ export default function Hero() {
         fastScrollEnd: true,
         refreshPriority: 11,
       }
-    }).to(mask, { scale: 100, transformOrigin: "center center", ease: "power2.inOut" })
-      .set(mask, { display: "none" });
+    }).to(mask, { scale: 100, transformOrigin: "center center", ease: "power2.inOut", duration: 1 })
+      .set(mask, { display: "none" })
+      .to({}, { duration: 1 }); // Empty tween to keep the section pinned while video plays
 
     const t1 = setTimeout(() => ScrollTrigger.refresh(), 400);
     const t2 = setTimeout(() => ScrollTrigger.refresh(), 1000);

@@ -4,13 +4,13 @@ import { useRef, useEffect } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import NovaRobot from "./NovaRobot";
 import RobotLighting from "./RobotLighting";
 
 export default function RobotScene() {
   const sceneGroupRef = useRef<THREE.Group>(null);
-  const pathname = usePathname();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (!sceneGroupRef.current || pathname !== "/") return;

@@ -1,7 +1,7 @@
 "use client";
 
 import RevealText from "@/components/animations/RevealText";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export default function CTASection() {
   return (
@@ -15,13 +15,13 @@ export default function CTASection() {
 
         <RevealText delay={0.2} className="flex flex-col sm:flex-row gap-6">
           <Link
-            href="/contact"
+            to="/contact"
             className="px-10 py-5 bg-[#00f0ff] text-black font-bold tracking-widest uppercase hover:bg-white transition-colors text-sm"
           >
             Request a Demo
           </Link>
           <Link
-            href="/robot"
+            to="/robot"
             className="px-10 py-5 bg-transparent border border-white/20 text-white font-medium tracking-widest uppercase hover:bg-white/5 transition-colors text-sm"
           >
             Explore the Robot

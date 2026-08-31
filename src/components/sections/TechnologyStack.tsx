@@ -1,6 +1,4 @@
-"use client";
-
-import { useRef, useState, Suspense } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -20,6 +18,11 @@ export default function TechnologyStack() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   const textElementsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(() => {
@@ -60,11 +63,13 @@ export default function TechnologyStack() {
       
       {/* 3D Canvas Background (Pinned by GSAP) */}
       <div ref={canvasContainerRef} className="absolute top-0 left-0 w-full h-[100svh] z-0 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 9], fov: 45 }} gl={{ alpha: true, antialias: true }} onCreated={() => setIsMounted(true)}>
-          <Suspense fallback={null}>
-            <TechEcosystem />
-          </Suspense>
-        </Canvas>
+        {isMounted && (
+          <Canvas camera={{ position: [0, 0, 9], fov: 45 }} gl={{ alpha: true, antialias: true }}>
+            <Suspense fallback={null}>
+              <TechEcosystem />
+            </Suspense>
+          </Canvas>
+        )}
         
         {/* Subtle gradient overlay to ensure text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#08080a] via-transparent to-[#08080a] opacity-80" />

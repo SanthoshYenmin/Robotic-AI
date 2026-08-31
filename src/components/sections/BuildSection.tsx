@@ -1,17 +1,12 @@
 "use client";
-import { useRef, useState } from "react";
-import dynamic from "next/dynamic";
+import { useRef, useState, lazy, Suspense, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 
-// Lazy-load the heavy 3D canvas so it never blocks SSR
-const BuildCanvas = dynamic(() => import("@/components/sections/_BuildCanvas"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-[#020810]" />,
-});
+// Lazy-load the heavy 3D canvas
+const BuildCanvas = lazy(() => import("@/components/sections/_BuildCanvas"));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,9 +59,15 @@ export default function BuildSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [stage, setStage] = useState(-1);
   const progressRef = useRef({ value: 0 });
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useGSAP(() => {
-    gsap.timeline({
+    if (!isMounted) return;
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
@@ -80,8 +81,9 @@ export default function BuildSection() {
           setStage(s);
         },
       },
-    }).to({}, { duration: 5 });
-  }, { scope: sectionRef });
+    });
+    tl.to({}, { duration: 5 });
+  }, { scope: sectionRef, dependencies: [isMounted] });
 
   const cur = STAGES[Math.max(0, stage)];
   const isFinal = stage >= 4;
@@ -91,9 +93,11 @@ export default function BuildSection() {
       ref={sectionRef}
       className="relative w-full h-screen bg-[#020810] text-white overflow-hidden"
     >
-      {/* ── 3D canvas ── */}
-      <div className="absolute inset-0 z-0">
-        <BuildCanvas progressRef={progressRef} />
+      {/* ── Background: 3D Scene ── */}
+      <div className="absolute inset-0 z-0 bg-[#020810]">
+        <Suspense fallback={<div className="absolute inset-0 bg-[#020810]" />}>
+          <BuildCanvas progressRef={progressRef} />
+        </Suspense>
       </div>
 
       {/* ── Scanlines ── */}

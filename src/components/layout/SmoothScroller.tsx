@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -9,7 +9,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function SmoothScroller({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -52,8 +52,14 @@ export default function SmoothScroller({ children }: { children: React.ReactNode
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const timeout = setTimeout(() => ScrollTrigger.refresh(), 150);
-    return () => clearTimeout(timeout);
+    const t1 = setTimeout(() => ScrollTrigger.refresh(), 150);
+    const t2 = setTimeout(() => ScrollTrigger.refresh(), 500);
+    const t3 = setTimeout(() => ScrollTrigger.refresh(), 1000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [pathname]);
 
   return <>{children}</>;

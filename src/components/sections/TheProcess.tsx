@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, Suspense } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -113,12 +113,18 @@ function TelRow({ label, value }: { label: string; value: string }) {
 export default function TheProcess() {
   const sectionRef = useRef<HTMLElement>(null);
   const [stage, setStage] = useState(-1); // -1 = before entering
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const progressRef = useRef({ value: 0 });
 
   // ── GSAP pin:true — most reliable approach when other sections above also use GSAP pin
   // GSAP handles position tracking, pin-spacer creation, and scroll progress internally.
   useGSAP(() => {
+    if (!isMounted) return;
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
@@ -147,7 +153,7 @@ export default function TheProcess() {
     });
     // Empty tween drives the timeline duration (6 units for 6 stages)
     tl.to({}, { duration: 6 });
-  });
+  }, { scope: sectionRef, dependencies: [isMounted] });
 
   const current = STAGES[Math.max(0, stage)];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -70,7 +70,7 @@ export default function Footer() {
               {['Home', 'Figure'].map((link) => (
                 <Link 
                   key={link} 
-                  href={link === 'Home' ? '/' : '/figure'} 
+                  to={link === 'Home' ? '/' : '/figure'} 
                   className="text-white/60 hover:text-[#00f0ff] hover:translate-x-2 transition-all"
                 >
                   {link}
