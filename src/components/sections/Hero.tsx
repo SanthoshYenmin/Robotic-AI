@@ -119,17 +119,7 @@ export default function Hero() {
                   video.play().catch(() => { });
                 }
               }}
-              className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 opacity-60"
-            />
-            {/* Extremely Lightweight CSS Cyan Tint Overlay */}
-            <div className="absolute inset-0 w-full h-full bg-[#00f0ff] opacity-10 mix-blend-color pointer-events-none" />
-
-            {/* CSS Scanlines Overlay */}
-            <div
-              className="absolute inset-0 w-full h-full pointer-events-none opacity-30 mix-blend-overlay"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.8) 2px, rgba(0,0,0,0.8) 4px)'
-              }}
+              className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
             />
           </div>
 

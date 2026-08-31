@@ -22,17 +22,19 @@ export default function Home() {
   return (
     <div className="w-full">
       <Hero />
-      <SectionDivider />
-      <Introduction />
-      <SectionDivider />
-      <Expertise />
-      <SectionDivider />
-      <FeaturedProject />
-      <SectionDivider />
-      <TechnologyStack />
-      <SectionDivider />
-      <TheProcess />
-      <BuildSection />
+      <div className="relative z-20 bg-black">
+        <SectionDivider />
+        <Introduction />
+        <SectionDivider />
+        <Expertise />
+        <SectionDivider />
+        <FeaturedProject />
+        <SectionDivider />
+        <TechnologyStack />
+        <SectionDivider />
+        <TheProcess />
+        <BuildSection />
+      </div>
     </div>
   );
 }

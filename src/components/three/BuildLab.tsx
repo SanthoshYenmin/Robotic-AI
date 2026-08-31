@@ -130,8 +130,6 @@ function AnimatedRobot({ progressRef }: { progressRef: React.MutableRefObject<{ 
   return (
     <group ref={groupRef} position={[0, -1.5, 0]}>
       <RealRobotModel rotation={[Math.PI / 2, 0, 0]} />
-      {/* Intense glow at the core */}
-      <pointLight color="#00f0ff" intensity={3} distance={4} position={[0, 1.5, 1]} />
     </group>
   );
 }
@@ -143,10 +141,9 @@ export default function BuildLab({ progressRef }: BuildLabProps) {
       {/* Force the WebGL background to be dark */}
       <color attach="background" args={["#020810"]} />
       
-      <ambientLight intensity={0.6} color="#051020" />
-      <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffffff" castShadow />
-      <pointLight position={[-8, 5, 2]} intensity={1.5} color="#00f0ff" />
-      <pointLight position={[8, -5, -2]} intensity={1.0} color="#00ff88" />
+      <ambientLight intensity={1.5} color="#ffffff" />
+      <directionalLight position={[5, 10, 5]} intensity={2} color="#ffffff" castShadow />
+      <directionalLight position={[-5, 5, -5]} intensity={1} color="#ffffff" />
 
       <BackgroundGrid />
       <ScannerRing progressRef={progressRef} />
