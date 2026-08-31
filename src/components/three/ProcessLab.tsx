@@ -2,8 +2,9 @@
 
 import { useRef, useMemo, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Grid, Line, Sphere, Box, Cylinder, Torus, Cone } from "@react-three/drei";
+import { Grid, Line, Sphere, Box, Cylinder, Torus, Cone, Center, Resize } from "@react-three/drei";
 import * as THREE from "three";
+import { Model as BehemothModel } from "@/components/three/BehemothModel";
 
 interface ProcessLabProps {
   progressRef: React.MutableRefObject<{ value: number }>;
@@ -227,20 +228,10 @@ export default function ProcessLab({ progressRef }: ProcessLabProps) {
     }
 
     // ═══ HEAD TRACK (slight look-around) ═══
-    if (robotHeadRef.current) {
-      if (p >= 4 && p < 5) {
-        // Train: head scans side to side
-        robotHeadRef.current.rotation.y = Math.sin(t * 1.2) * 0.4;
-      } else {
-        robotHeadRef.current.rotation.y = THREE.MathUtils.lerp(robotHeadRef.current.rotation.y, 0, 0.05);
-      }
-    }
+    // Skipped for Behemoth model as it doesn't have a separate head ref
 
     // ═══ EYE GLOW ═══
-    if (eyeGlowRef.current) {
-      const eyeMat = eyeGlowRef.current.material as THREE.MeshStandardMaterial;
-      eyeMat.emissiveIntensity = p >= 4 ? 3 + Math.sin(t * 10) * 1.5 : 1 + Math.sin(t * 2) * 0.3;
-    }
+    // Skipped for Behemoth model as it doesn't have a separate eye glow ref
 
     // ═══ VISION CONE (Train) ═══
     if (visionConeRef.current) {
@@ -285,11 +276,11 @@ export default function ProcessLab({ progressRef }: ProcessLabProps) {
 
   return (
     <group>
-      {/* ── Lighting ── */}
-      <ambientLight intensity={0.25} />
-      <pointLight position={[0, 8, 4]} intensity={2} color="#00f0ff" />
-      <pointLight position={[6, 4, -4]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[-6, 4, -4]} intensity={0.8} color="#0040ff" />
+      {/* ── Lighting (Neutral white to preserve original model colors) ── */}
+      <ambientLight intensity={0.6} />
+      <pointLight position={[0, 8, 4]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[6, 4, -4]} intensity={1.0} color="#ffffff" />
+      <pointLight position={[-6, 4, -4]} intensity={1.0} color="#ffffff" />
 
       {/* ── Grid Floor ── */}
       <Grid
@@ -328,73 +319,20 @@ export default function ProcessLab({ progressRef }: ProcessLabProps) {
       {/* ── Robot ── */}
       <group ref={robotGroupRef} position={[0, 0, 0]}>
 
-        {/* Legs */}
-        {[-0.28, 0.28].map((x, i) => (
-          <group key={i} position={[x, -0.85, 0]}>
-            <Cylinder args={[0.11, 0.11, 0.85, 8]} position={[0, 0, 0]}>
-              <primitive object={solidMat} attach="material" />
-            </Cylinder>
-            <Cylinder args={[0.12, 0.12, 0.87, 8]} position={[0, 0, 0]}>
-              <primitive object={wireMat} attach="material" />
-            </Cylinder>
-          </group>
-        ))}
-
-        {/* Body */}
-        <Box args={[1, 1.15, 0.65]} position={[0, 0, 0]}>
-          <primitive object={solidMat} attach="material" />
-        </Box>
-        <Box args={[1.05, 1.2, 0.7]} position={[0, 0, 0]}>
-          <primitive object={wireMat} attach="material" />
-        </Box>
-        {/* Chest core */}
-        <Box args={[0.28, 0.08, 0.06]} position={[0, 0, 0.34]}>
-          <primitive object={glowMat} attach="material" />
-        </Box>
-        <Sphere args={[0.07, 10, 10]} position={[0, 0.2, 0.34]}>
-          <primitive object={glowMat} attach="material" />
-        </Sphere>
-
-        {/* Left Arm */}
-        <group position={[-0.68, 0.08, 0]}>
-          <Cylinder args={[0.1, 0.1, 0.85, 8]} rotation={[0, 0, Math.PI / 7]}>
-            <primitive object={solidMat} attach="material" />
-          </Cylinder>
-          <Cylinder args={[0.11, 0.11, 0.88, 8]} rotation={[0, 0, Math.PI / 7]}>
-            <primitive object={wireMat} attach="material" />
-          </Cylinder>
+        {/* Real 3D Model */}
+        <group position={[0, 1.2, 0]}>
+          <Center bottom>
+            <Resize scale={2.2}>
+              <BehemothModel rotation={[0, Math.PI, 0]} />
+            </Resize>
+          </Center>
         </group>
 
-        {/* Right Arm */}
-        <group position={[0.68, 0.08, 0]}>
-          <Cylinder args={[0.1, 0.1, 0.85, 8]} rotation={[0, 0, -Math.PI / 7]}>
-            <primitive object={solidMat} attach="material" />
-          </Cylinder>
-          <Cylinder args={[0.11, 0.11, 0.88, 8]} rotation={[0, 0, -Math.PI / 7]}>
-            <primitive object={wireMat} attach="material" />
-          </Cylinder>
-        </group>
-
-        {/* Head */}
-        <group ref={robotHeadRef} position={[0, 1, 0]}>
-          <Box args={[0.58, 0.58, 0.58]}>
-            <primitive object={solidMat} attach="material" />
-          </Box>
-          <Box args={[0.63, 0.63, 0.63]}>
-            <primitive object={wireMat} attach="material" />
-          </Box>
-          {/* Eye visor */}
-          <Box ref={eyeGlowRef} args={[0.45, 0.08, 0.04]} position={[0, 0.06, 0.3]}>
-            <primitive object={glowMat} attach="material" />
-          </Box>
-          {/* Antenna */}
-          <Cylinder args={[0.018, 0.018, 0.3, 6]} position={[0, 0.44, 0]}>
-            <meshStandardMaterial color="#00f0ff" emissive="#00f0ff" emissiveIntensity={1} />
-          </Cylinder>
-          <Sphere args={[0.04, 8, 8]} position={[0, 0.6, 0]}>
-            <meshStandardMaterial color="#00f0ff" emissive="#00f0ff" emissiveIntensity={3} />
-          </Sphere>
-        </group>
+        {/* Dummy refs to satisfy animation loop */}
+        <group ref={robotHeadRef} />
+        <mesh ref={eyeGlowRef}>
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
 
         {/* ── Blueprint Rings ── */}
         <group ref={blueprintRingsRef} scale={0}>

@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 export default function FigurePage() {
   return (
-    <main className="bg-white text-black min-h-screen w-full">
+    <main className="bg-black text-white min-h-screen w-full">
       {/* Top Navbar Shadow */}
-      <div className="fixed top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 to-transparent z-50 pointer-events-none" />
+      <div className="fixed top-0 left-0 w-full h-32 bg-gradient-to-b from-black to-transparent z-40 pointer-events-none" />
 
       {/* Spacer below Navbar */}
       <div className="w-full h-32 md:h-40"></div>
@@ -46,7 +46,7 @@ export default function FigurePage() {
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-medium tracking-tighter leading-none mb-6 uppercase">
               Figure 03
             </h1>
-            <p className="text-black/80 text-base md:text-lg lg:text-xl font-light leading-snug tracking-tight max-w-lg">
+            <p className="text-white/80 text-base md:text-lg lg:text-xl font-light leading-snug tracking-tight max-w-lg">
               Figure takes care of household tasks like laundry, cleaning, and doing dishes, all autonomously.
             </p>
           </motion.div>
@@ -59,24 +59,24 @@ export default function FigurePage() {
             transition={{ duration: 1 }}
             className="w-full my-16 md:my-24 -ml-8 md:-ml-10 lg:-ml-12 pr-0"
           >
-            <div className="border-b border-black/20 py-6 md:py-8 flex flex-col items-end w-full">
-              <span className="text-black/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Height</span>
+            <div className="border-b border-white/20 py-6 md:py-8 flex flex-col items-end w-full">
+              <span className="text-white/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Height</span>
               <span className="text-5xl md:text-6xl font-light tracking-tighter">5'8"</span>
             </div>
-            <div className="border-b border-black/20 py-6 md:py-8 flex flex-col items-end w-full">
-              <span className="text-black/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Payload</span>
+            <div className="border-b border-white/20 py-6 md:py-8 flex flex-col items-end w-full">
+              <span className="text-white/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Payload</span>
               <span className="text-5xl md:text-6xl font-light tracking-tighter">20KG</span>
             </div>
-            <div className="border-b border-black/20 py-6 md:py-8 flex flex-col items-end w-full">
-              <span className="text-black/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Weight</span>
+            <div className="border-b border-white/20 py-6 md:py-8 flex flex-col items-end w-full">
+              <span className="text-white/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Weight</span>
               <span className="text-5xl md:text-6xl font-light tracking-tighter">61KG</span>
             </div>
-            <div className="border-b border-black/20 py-6 md:py-8 flex flex-col items-end w-full">
-              <span className="text-black/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Runtime</span>
+            <div className="border-b border-white/20 py-6 md:py-8 flex flex-col items-end w-full">
+              <span className="text-white/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Runtime</span>
               <span className="text-5xl md:text-6xl font-light tracking-tighter">5HR</span>
             </div>
-            <div className="border-b border-black/20 py-6 md:py-8 flex flex-col items-end w-full">
-              <span className="text-black/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Speed</span>
+            <div className="border-b border-white/20 py-6 md:py-8 flex flex-col items-end w-full">
+              <span className="text-white/50 text-sm md:text-base font-semibold uppercase tracking-widest mb-1">Speed</span>
               <span className="text-5xl md:text-6xl font-light tracking-tighter">1.2M/S</span>
             </div>
           </motion.div>
@@ -92,7 +92,7 @@ export default function FigurePage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-tight mb-4 uppercase">
               Interact with Figure like you would with a human
             </h2>
-            <p className="text-black/80 text-base md:text-lg font-light leading-snug">
+            <p className="text-white/80 text-base md:text-lg font-light leading-snug">
               Talk, ask, or delegate. Figure understands and takes action.
             </p>
           </motion.div>
@@ -101,7 +101,7 @@ export default function FigurePage() {
       </div>
 
       {/* VIDEOS SECTION - after the robot image */}
-      <div className="w-full bg-white py-8 md:py-16 space-y-8 md:space-y-12 px-4 md:px-0">
+      <div className="w-full bg-black py-8 md:py-16 space-y-8 md:space-y-12 px-4 md:px-0">
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}

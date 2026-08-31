@@ -27,10 +27,10 @@ const STAGES = [
     title: "The System\nComes Online.",
     desc: "Perception, decision-making, and autonomy. The foundations of every robot I build.",
     labels: [
-      { text: "PERCEPTION",   top: "20%", left: "8%"  },
+      { text: "PERCEPTION", top: "20%", left: "8%" },
       { text: "INTELLIGENCE", top: "32%", left: "72%" },
-      { text: "MOVEMENT",     top: "68%", left: "6%"  },
-      { text: "AUTONOMY",     top: "78%", left: "74%" },
+      { text: "MOVEMENT", top: "68%", left: "6%" },
+      { text: "AUTONOMY", top: "78%", left: "74%" },
     ],
   },
   {
@@ -38,11 +38,11 @@ const STAGES = [
     title: "Components\nConnecting.",
     desc: "Every part has a purpose. Every connection enables a new capability.",
     parts: [
-      { text: "◈ CAMERA",  top: "14%", left: "44%" },
-      { text: "◈ ARM-L",   top: "45%", left: "4%"  },
-      { text: "◈ ARM-R",   top: "45%", left: "78%" },
-      { text: "◈ CPU",     top: "80%", left: "44%" },
-      { text: "◈ SENSOR",  top: "28%", left: "76%" },
+      { text: "◈ CAMERA", top: "14%", left: "44%" },
+      { text: "◈ ARM-L", top: "45%", left: "4%" },
+      { text: "◈ ARM-R", top: "45%", left: "78%" },
+      { text: "◈ CPU", top: "80%", left: "44%" },
+      { text: "◈ SENSOR", top: "28%", left: "76%" },
       { text: "◈ GRIPPER", top: "68%", left: "77%" },
     ],
   },
@@ -61,7 +61,7 @@ const STAGES = [
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function BuildSection() {
-  const sectionRef  = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [stage, setStage] = useState(-1);
   const progressRef = useRef({ value: 0 });
 
@@ -181,9 +181,7 @@ export default function BuildSection() {
       {/* ── Top-Left: Section Label ── */}
       <div className="absolute z-30 pointer-events-none spx-l" style={{ top: "80px" }}>
         <div className="section-label">
-          <span className="section-label-num">07</span>
-          <div className="section-label-divider" />
-          <span className="section-label-text">06 / LET&apos;S BUILD</span>
+          <span className="section-label-text">LET'S BUILD</span>
         </div>
       </div>
 
@@ -207,8 +205,28 @@ export default function BuildSection() {
       {/* ── Dynamic Layout (Stage Text) ── */}
       <div className="absolute inset-0 z-30 pointer-events-none flex flex-col">
         <AnimatePresence mode="wait">
-          {/* STAGES 0-3: Top-Left Alignment */}
-          {!isFinal && stage >= 0 && (
+          {isFinal ? (
+            /* STAGE 4 (FINAL): Center Alignment */
+            <motion.div
+              key="stage-final"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto z-40 px-6"
+            >
+              <div className="font-mono text-[10px] tracking-[0.5em] text-[#00f0ff] mb-6 uppercase animate-pulse">
+                SYSTEM DEPLOYMENT READY
+              </div>
+              <h2 className="section-heading mb-6" style={{ fontSize: "clamp(3rem, 6vw, 4.5rem)" }}>
+                {cur?.title}
+              </h2>
+              <p className="section-body mx-auto max-w-2xl mb-10">
+                {cur?.desc}
+              </p>
+            </motion.div>
+          ) : stage >= 0 ? (
+            /* STAGES 0-3: Top-Left Alignment */
             <motion.div
               key={`stage-${stage}`}
               initial={{ opacity: 0, y: 20 }}
@@ -220,50 +238,14 @@ export default function BuildSection() {
               <div className="font-mono text-[9px] tracking-[0.4em] text-[#00f0ff] mb-3 uppercase">
                 {cur?.phase}
               </div>
-              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[1.05] text-white mb-4">
+              <h2 className="section-heading mb-4">
                 {cur?.title}
               </h2>
-              <p className="text-sm font-light leading-relaxed text-white/50 max-w-sm">
+              <p className="section-body">
                 {cur?.desc}
               </p>
             </motion.div>
-          )}
-
-          {/* STAGE 4 (FINAL): Center Alignment */}
-          {isFinal && (
-            <motion.div
-              key="stage-final"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto z-40 px-6"
-            >
-              <div className="font-mono text-[10px] tracking-[0.5em] text-[#00f0ff] mb-6 uppercase animate-pulse">
-                SYSTEM DEPLOYMENT READY
-              </div>
-              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none text-white mb-6">
-                {cur?.title}
-              </h2>
-              <p className="text-base md:text-lg font-light leading-relaxed text-white/60 max-w-2xl mb-10">
-                {cur?.desc}
-              </p>
-              
-              <div className="flex flex-col md:flex-row gap-6 items-center">
-                <Link
-                  href="/contact"
-                  className="group relative flex items-center gap-4 px-10 py-5 bg-[#00f0ff] text-black font-bold text-sm uppercase tracking-widest transition-all duration-300 hover:bg-white hover:scale-[1.03] shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(255,255,255,0.5)]"
-                >
-                  START A PROJECT →
-                </Link>
-                <a
-                  href="mailto:hello@novarobotics.dev"
-                  className="flex items-center gap-3 px-10 py-5 border border-white/20 text-white font-medium text-sm uppercase tracking-widest transition-all duration-300 hover:border-[#00f0ff] hover:text-[#00f0ff] bg-black/50 backdrop-blur-md"
-                >
-                  LET&apos;S CONNECT ↗
-                </a>
-              </div>
-            </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </div>
 

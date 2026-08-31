@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState("01 ABOUT");
+  const [activeMenu, setActiveMenu] = useState("ABOUT");
   const pathname = usePathname();
 
   useEffect(() => {
@@ -22,11 +22,11 @@ export default function Navbar() {
         const el = document.getElementById(section);
         if (el && window.scrollY >= el.offsetTop - 300) {
           const names: Record<string, string> = {
-            "about": "01 ABOUT",
-            "systems": "02 SYSTEMS",
-            "technology": "03 TECHNOLOGY",
-            "process": "04 PROCESS",
-            "projects": "05 PROJECTS"
+            "about": "ABOUT",
+            "systems": "SYSTEMS",
+            "technology": "TECHNOLOGY",
+            "process": "PROCESS",
+            "projects": "PROJECTS"
           };
           setActiveMenu(names[section]);
           break;
@@ -38,12 +38,8 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "01 ABOUT", href: "/about" },
-    { name: "02 SYSTEMS", href: "/#systems" },
-    { name: "03 TECHNOLOGY", href: "/#technology" },
-    { name: "04 PROCESS", href: "/#process" },
-    { name: "05 PROJECTS", href: "/#projects" },
-    { name: "06 FIGURE", href: "/figure" },
+    { name: "HOME", href: "/" },
+    { name: "FIGURE", href: "/figure" },
   ];
 
   const handleNavClick = (name: string, href: string) => {
@@ -67,10 +63,11 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-        className={`fixed top-4 md:top-6 left-4 md:left-8 right-4 md:right-8 z-50 transition-all duration-700 rounded-2xl border ${
+        style={{ padding: scrolled ? '1rem 0' : '1.5rem 0' }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
           scrolled
-            ? "bg-[#020810]/80 backdrop-blur-xl border-[#00f0ff]/20 py-4 shadow-[0_8px_30px_rgba(0,240,255,0.05)]"
-            : "bg-transparent border-transparent py-6"
+            ? "bg-[#050505]/70 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,240,255,0.05)]"
+            : "bg-transparent"
         }`}
       >
         <div className="container mx-auto spx flex items-center justify-between">
@@ -107,19 +104,12 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right: LET'S BUILD */}
-          <Link 
-            href="#build"
-            className="hidden md:flex items-center gap-3 border border-[#00f0ff]/40 px-8 py-3 text-xs font-mono tracking-[0.3em] uppercase text-[#00f0ff] hover:bg-[#00f0ff] hover:text-black transition-all duration-500 relative overflow-hidden group"
-          >
-            {/* Scanline hover animation */}
-            <div className="absolute inset-0 w-[50%] bg-white/30 -translate-x-full group-hover:animate-scanline" />
-            <span className="relative z-10 font-bold">LET'S BUILD &rarr;</span>
-          </Link>
+
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden text-[#00f0ff] px-5 py-2.5 flex items-center gap-2 font-mono text-xs tracking-widest border border-white/20 bg-black/50"
+            style={{ padding: '0.5rem' }}
+            className="md:hidden text-[#00f0ff] flex items-center gap-2 font-mono text-xs tracking-widest hover:text-white transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? "CLOSE [X]" : "MENU [=]"}
@@ -134,7 +124,7 @@ export default function Navbar() {
               animate={{ opacity: 1, height: "100vh" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-              className="md:hidden fixed top-[70px] left-0 right-0 bg-[#020810]/95 backdrop-blur-2xl border-t border-[#00f0ff]/20 flex flex-col items-center justify-center gap-10 overflow-hidden z-40"
+              className="md:hidden fixed top-[60px] left-0 right-0 bg-[#050505]/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-10 overflow-hidden z-40"
             >
               {navLinks.map((link) => {
                 const isActive = activeMenu === link.name;
@@ -156,13 +146,7 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              <Link
-                href="#build"
-                className="mt-10 border border-[#00f0ff] text-[#00f0ff] px-12 py-5 text-sm md:text-base font-mono tracking-[0.4em] uppercase font-bold hover:bg-[#00f0ff] hover:text-black transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                LET'S BUILD &rarr;
-              </Link>
+
             </motion.div>
           )}
         </AnimatePresence>

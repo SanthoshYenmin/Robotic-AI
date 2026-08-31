@@ -30,8 +30,10 @@ export default function Introduction() {
     const innerCore = coreRef.current?.innerCoreRef?.current;
     const rings = coreRef.current?.ringsRef?.current;
 
+    let mm = gsap.matchMedia();
+
     // Initial state
-    gsap.set(leftContentRef.current, { opacity: 0, x: -50 });
+    gsap.set(leftContentRef.current, { opacity: 0, y: 30 }); // Changed from x: -50 to y: 30 for better mobile flow
     gsap.set(labelsRef.current?.children || [], { opacity: 0, x: -20 });
     
     // Split title for word-by-word reveal
@@ -44,50 +46,67 @@ export default function Introduction() {
       gsap.set(group.scale, { x: 0.2, y: 0.2, z: 0.2 });
     }
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: "+=2000",
-        pin: true,
-        scrub: 1,
-        refreshPriority: 9,
+    mm.add({
+      isDesktop: "(min-width: 768px)",
+      isMobile: "(max-width: 767px)"
+    }, (context) => {
+      let { isDesktop } = context.conditions as { isDesktop: boolean };
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "+=2000",
+          pin: true,
+          scrub: 1,
+          refreshPriority: 9,
+        }
+      });
+
+      // 1. Core expands and shifts
+      if (group && rings && innerCore) {
+        tl.to(group.scale, { 
+            x: isDesktop ? 0.65 : 0.45, 
+            y: isDesktop ? 0.65 : 0.45, 
+            z: isDesktop ? 0.65 : 0.45, 
+            duration: 2, ease: "power2.out" 
+          }, 0)
+          .to(group.position, { 
+            x: isDesktop ? 1.2 : 0, 
+            y: isDesktop ? 0 : -2.5, // Shift down on mobile
+            duration: 2, ease: "power2.inOut" 
+          }, 0)
+          .to(rings.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 2 }, 0)
+          .to(innerCore.scale, { x: 0.8, y: 0.8, z: 0.8, duration: 2 }, 0);
+      }
+
+      // 2. Labels sequentially appear around the core (Desktop only)
+      if (isDesktop && labelsRef.current?.children) {
+        tl.to(labelsRef.current.children, {
+          opacity: 1,
+          x: 0,
+          stagger: 0.3,
+          duration: 1,
+          ease: "power2.out"
+        }, 0.5);
+      }
+
+      // 3. Left content reveals
+      tl.to(leftContentRef.current, { opacity: 1, y: 0, x: 0, duration: 1, ease: "power3.out" }, 1);
+      
+      // Word by word title reveal
+      if (titleWords.length > 0) {
+        tl.to(titleWords, {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.8,
+          ease: "power2.out"
+        }, 1.5);
       }
     });
 
-    // 1. Core expands and shifts right
-    if (group && rings && innerCore) {
-      tl.to(group.scale, { x: 0.65, y: 0.65, z: 0.65, duration: 2, ease: "power2.out" }, 0)
-        .to(group.position, { x: 1.2, duration: 2, ease: "power2.inOut" }, 0)
-        .to(rings.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 2 }, 0) // Rings open up
-        .to(innerCore.scale, { x: 0.8, y: 0.8, z: 0.8, duration: 2 }, 0); // Inner core expands slightly
-    }
-
-    // 2. Labels sequentially appear around the core
-    if (labelsRef.current?.children) {
-      tl.to(labelsRef.current.children, {
-        opacity: 1,
-        x: 0,
-        stagger: 0.3,
-        duration: 1,
-        ease: "power2.out"
-      }, 0.5);
-    }
-
-    // 3. Left content reveals
-    tl.to(leftContentRef.current, { opacity: 1, x: 0, duration: 1, ease: "power3.out" }, 1);
-    
-    // Word by word title reveal
-    if (titleWords.length > 0) {
-      tl.to(titleWords, {
-        opacity: 1,
-        y: 0,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: "power2.out"
-      }, 1.5);
-    }
-
+    return () => mm.revert();
   }, { scope: sectionRef, dependencies: [isMounted] });
 
   // Handle CTA Hover Effect (Core pulse + Scan line)
@@ -131,48 +150,40 @@ export default function Introduction() {
       </div>
 
       {/* Interactive Labels overlay for 3D Core */}
-      <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-end pr-[10vw]">
-        <div ref={labelsRef} className="flex flex-col gap-12 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em]">
+      <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-end justify-end pb-12 pr-6 md:flex-row md:items-center md:justify-end md:pb-0 md:pr-[10vw]">
+        <div ref={labelsRef} className="flex flex-col gap-4 md:gap-12 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] scale-[0.65] md:scale-100 origin-bottom-right md:origin-right">
           <div className="flex items-center gap-4">
             <span className="w-12 h-px bg-[#00f0ff]/50" />
-            <span className="backdrop-blur-sm bg-black/20 px-3 py-1 border border-[#00f0ff]/20 rounded">AI Core</span>
+            <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">AI Core</span>
           </div>
           <div className="flex items-center gap-4 translate-x-12">
             <span className="w-8 h-px bg-[#00f0ff]/50" />
-            <span className="backdrop-blur-sm bg-black/20 px-3 py-1 border border-[#00f0ff]/20 rounded">Vision</span>
+            <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Vision</span>
           </div>
           <div className="flex items-center gap-4 translate-x-4">
             <span className="w-16 h-px bg-[#00f0ff]/50" />
-            <span className="backdrop-blur-sm bg-black/20 px-3 py-1 border border-[#00f0ff]/20 rounded">Motion</span>
+            <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Motion</span>
           </div>
           <div className="flex items-center gap-4 -translate-x-8">
             <span className="w-20 h-px bg-[#00f0ff]/50" />
-            <span className="backdrop-blur-sm bg-black/20 px-3 py-1 border border-[#00f0ff]/20 rounded">Decision</span>
+            <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Decision</span>
           </div>
         </div>
       </div>
 
       {/* Foreground Content */}
-      <div className="relative z-20 container mx-auto h-full px-6 md:px-12 lg:px-24 section-top pointer-events-none">
+      <div style={{ paddingTop: '140px' }} className="relative z-20 container mx-auto h-full px-6 md:px-12 lg:px-24 pointer-events-none">
         
         <div ref={leftContentRef} className="w-full max-w-2xl pointer-events-auto">
           {/* Section Marker */}
           <div className="section-label">
-            <span className="section-label-num">02</span>
-            <div className="section-label-divider" />
-            <span className="section-label-text">01 / WHO I AM</span>
+            <span className="section-label-text">WHO I AM</span>
           </div>
-
-          {/* Small Heading */}
-          <p className="text-[#00f0ff] font-mono text-xs uppercase tracking-[0.4em] mb-6 flex items-center gap-4">
-            <span className="w-2 h-2 bg-[#00f0ff]" />
-            01 / WHO I AM
-          </p>
 
           {/* Title */}
           <h2 ref={titleRef} className="section-heading flex flex-wrap gap-x-4 gap-y-2">
             {"Turning Ideas Into Intelligent Machines.".split(" ").map((word, i) => (
-              <span key={i} className={`word inline-block ${word === "Intelligent" || word === "Machines." ? "heading-gradient" : ""}`}>
+              <span key={i} className={`word inline-block ${word === "Intelligent" || word === "Machines." ? "text-[#00f0ff]" : ""}`}>
                 {word}
               </span>
             ))}
@@ -180,31 +191,10 @@ export default function Introduction() {
 
           {/* Content */}
           <p className="section-body mb-12">
-            I'm a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <span className="text-white font-medium">software, hardware, AI,</span> and <span className="text-white font-medium">intelligent algorithms</span> to transform ideas into practical robotic systems.
+            I'm a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <strong>software, hardware, AI,</strong> and <strong>intelligent algorithms</strong> to transform ideas into practical robotic systems.
           </p>
 
-          {/* Button */}
-          <button 
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className="group relative inline-flex items-center gap-4 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 overflow-hidden transition-all duration-500 hover:border-[#00f0ff]/50 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)]"
-          >
-            {/* Button inner glow */}
-            <div className="absolute inset-0 w-0 bg-[#00f0ff]/10 group-hover:w-full transition-all duration-500 ease-out" />
-            
-            <span className="relative z-10 text-white group-hover:text-[#00f0ff] font-mono text-xs uppercase tracking-widest transition-colors duration-300">
-              More About Me
-            </span>
-            
-            <svg 
-              className={`relative z-10 w-4 h-4 text-white/50 group-hover:text-[#00f0ff] transform transition-transform duration-300 ${isHovered ? "translate-x-2" : ""}`} 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
+
 
         </div>
       </div>

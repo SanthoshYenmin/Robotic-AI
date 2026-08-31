@@ -35,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${jetbrains.variable}`}>
-      <body className="antialiased bg-[#0a0a0a] text-[#f2f2f2]">
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${jetbrains.variable}`} suppressHydrationWarning>
+      <body className="antialiased bg-[#0a0a0a] text-[#f2f2f2]" suppressHydrationWarning>
         <GlobalCanvas />
         <SmoothScroller>
           <Navbar />

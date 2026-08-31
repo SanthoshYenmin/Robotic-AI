@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, forwardRef, useImperativeHandle } from "react";
+import { useRef, forwardRef, useImperativeHandle, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Grid, Box, Cylinder, Line, Sphere } from "@react-three/drei";
+import { Grid, Box, Cylinder, Line, Sphere, Center, Environment } from "@react-three/drei"; // Force HMR
 import * as THREE from "three";
+import { Model as RobotA04Model } from "@/components/three/RobotA04Model";
 
 export interface AutonomousRoverRef {
   roverRef: React.RefObject<THREE.Group | null>;
@@ -14,12 +15,20 @@ export interface AutonomousRoverRef {
   cameraGroupRef: React.RefObject<THREE.Group | null>;
 }
 
-const AutonomousRover = forwardRef<AutonomousRoverRef, {}>((_, ref) => {
+interface AutonomousRoverProps {
+  onReady?: () => void;
+}
+
+const AutonomousRover = forwardRef<AutonomousRoverRef, AutonomousRoverProps>(({ onReady }, ref) => {
   const roverRef = useRef<THREE.Group>(null);
   const lidarBeamRef = useRef<THREE.Mesh>(null);
   const scannerHeadRef = useRef<THREE.Mesh>(null);
-  const wheelsRef = useRef<THREE.Group>(null);
-  
+
+  useEffect(() => {
+    if (onReady) onReady();
+  }, [onReady]);
+
+
   const originalPathRef = useRef<THREE.Group>(null);
   const newPathRef = useRef<THREE.Group>(null);
   const obstacleRef = useRef<THREE.Group>(null);
@@ -38,14 +47,6 @@ const AutonomousRover = forwardRef<AutonomousRoverRef, {}>((_, ref) => {
     // Spin LiDAR head constantly
     if (scannerHeadRef.current) {
       scannerHeadRef.current.rotation.y += delta * 5;
-    }
-    
-    // Spin wheels if the rover is moving (we can check its velocity or just animate it constantly for effect)
-    // Actually, we'll let GSAP move the rover. We can just spin wheels slightly based on time, or leave them static since it's stylized.
-    if (wheelsRef.current) {
-      wheelsRef.current.children.forEach((wheel) => {
-        wheel.rotation.x -= delta * 2;
-      });
     }
 
     // Parallax effect for the whole scene container (camera group)
@@ -77,19 +78,19 @@ const AutonomousRover = forwardRef<AutonomousRoverRef, {}>((_, ref) => {
 
   return (
     <group ref={cameraGroupRef}>
-      
+
       {/* Environment Grid */}
-      <Grid 
-        args={[20, 20]} 
-        cellSize={1} 
-        cellThickness={1} 
-        cellColor="#00f0ff" 
-        sectionSize={5} 
-        sectionThickness={1.5} 
-        sectionColor="#00f0ff" 
-        fadeDistance={15} 
-        fadeStrength={1} 
-        position={[0, 0, 0]} 
+      <Grid
+        args={[20, 20]}
+        cellSize={1}
+        cellThickness={1}
+        cellColor="#00f0ff"
+        sectionSize={5}
+        sectionThickness={1.5}
+        sectionColor="#00f0ff"
+        fadeDistance={15}
+        fadeStrength={1}
+        position={[0, 0, 0]}
       />
 
       {/* Original Path (Straight) */}
@@ -114,54 +115,35 @@ const AutonomousRover = forwardRef<AutonomousRoverRef, {}>((_, ref) => {
 
       {/* The Rover */}
       <group ref={roverRef} position={[0, 0, 5]}>
-        {/* Chassis */}
-        <Box args={[1.2, 0.4, 1.8]} position={[0, 0.4, 0]}>
-          <meshStandardMaterial color="#222" metalness={0.8} roughness={0.2} />
-        </Box>
-        <Box args={[1.3, 0.1, 1.9]} position={[0, 0.6, 0]}>
-          <meshStandardMaterial color="#00f0ff" wireframe />
-        </Box>
 
-        {/* Wheels */}
-        <group ref={wheelsRef}>
-          {[-0.7, 0.7].map((x) => (
-            [-0.6, 0.6].map((z) => (
-              <Cylinder key={`${x}-${z}`} args={[0.3, 0.3, 0.2, 16]} rotation={[0, 0, Math.PI / 2]} position={[x, 0.3, z]}>
-                <meshStandardMaterial color="#111" />
-              </Cylinder>
-            ))
-          ))}
+        {/* Real 3D Robot Model */}
+        <group position={[0, 0, 0]}>
+          <Center top>
+            {/* We rotate Math.PI so it faces the correct moving direction (-z) */}
+            <RobotA04Model rotation={[0, Math.PI, 0]} scale={0.7} />
+          </Center>
         </group>
 
-        {/* LiDAR Sensor */}
-        <group position={[0, 0.8, 0.4]}>
-          <Cylinder args={[0.15, 0.15, 0.2, 16]}>
-            <meshStandardMaterial color="#444" />
+        {/* Keep the LiDAR Scanner Beam for the animation effect */}
+        <group position={[0, 2.0, 0]}>
+          <Cylinder ref={scannerHeadRef} args={[0.01, 0.01, 0.01, 8]} position={[0, 0, 0]}>
+            <meshBasicMaterial transparent opacity={0} />
           </Cylinder>
-          <Cylinder ref={scannerHeadRef} args={[0.1, 0.1, 0.15, 16]} position={[0, 0.15, 0]}>
-            <meshStandardMaterial color="#111" />
-            <meshStandardMaterial color="#00f0ff" emissive="#00f0ff" emissiveIntensity={2} attach="material-1" />
-          </Cylinder>
-          
+
           {/* Sweeping Beam */}
-          <Cylinder ref={lidarBeamRef} args={[0.01, 3, 0.1, 32, 1, true, 0, Math.PI / 4]} position={[0, 0.15, 0]} rotation={[0, 0, 0]} scale={0}>
-             <meshBasicMaterial color="#00f0ff" transparent opacity={0.1} side={THREE.DoubleSide} depthWrite={false} />
+          <Cylinder ref={lidarBeamRef} args={[0.01, 4, 0.1, 32, 1, true, 0, Math.PI / 3]} position={[0, 0, 0]} rotation={[0, (Math.PI * 5) / 6, 0]} scale={0}>
+            <meshBasicMaterial color="#00f0ff" transparent opacity={0.15} side={THREE.DoubleSide} depthWrite={false} blending={THREE.AdditiveBlending} />
           </Cylinder>
         </group>
 
-        {/* Front Sensors/Lights */}
-        <Sphere args={[0.05, 8, 8]} position={[0.4, 0.5, -0.9]}>
-          <meshBasicMaterial color="#00f0ff" />
-        </Sphere>
-        <Sphere args={[0.05, 8, 8]} position={[-0.4, 0.5, -0.9]}>
-          <meshBasicMaterial color="#00f0ff" />
-        </Sphere>
       </group>
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <pointLight position={[5, 10, 5]} intensity={1} color="#00f0ff" />
-      <pointLight position={[-5, 5, -5]} intensity={0.5} color="#ffffff" />
+      {/* Lighting & Reflections */}
+      <ambientLight intensity={0.8} />
+      <pointLight position={[5, 10, 5]} intensity={2} color="#00f0ff" />
+      <pointLight position={[-5, 5, -5]} intensity={1.5} color="#00ff88" />
+      <directionalLight position={[0, 10, 10]} intensity={1.5} color="#ffffff" />
+      <Environment preset="city" />
     </group>
   );
 });

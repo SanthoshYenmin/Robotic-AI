@@ -143,12 +143,12 @@ export default function BuildLab({ progressRef }: BuildLabProps) {
   return (
     <>
       <ambientLight intensity={0.3} color="#051020" />
-      <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffffff" castShadow />
+      <directionalLight position={[5, 10, 5]} intensity={0.4} color="#ffffff" castShadow />
       <pointLight position={[-8, 5, 2]} intensity={1.2} color="#00f0ff" />
       <pointLight position={[8, -5, -2]} intensity={0.8} color="#00ff88" />
       
-      {/* Realism for PBR Materials */}
-      <Environment preset="city" />
+      {/* Realism for PBR Materials without bright sky glare */}
+      <Environment preset="studio" blur={0.5} />
 
       <BackgroundGrid />
       <ScannerRing progressRef={progressRef} />

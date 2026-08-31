@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, Suspense } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -96,7 +96,7 @@ const STATUS_COLORS: Record<string, string> = {
 function TelRow({ label, value }: { label: string; value: string }) {
   const col = STATUS_COLORS[value] ?? "#ffffff66";
   return (
-    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-white/5">
+    <div style={{ padding: '0.375rem 0' }} className="flex items-center justify-between gap-3 border-b border-white/5">
       <span className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em]">{label}</span>
       <span className="font-mono text-[10px] tracking-widest flex items-center gap-1.5" style={{ color: col }}>
         <span
@@ -128,9 +128,20 @@ export default function TheProcess() {
         scrub: 1,
         refreshPriority: 5,
         onUpdate: (self) => {
-          progressRef.current.value = self.progress * 6;
-          const s = self.progress < 0.005 ? -1 : Math.min(5, Math.floor(self.progress * 6));
+          const val = self.progress * 6;
+          progressRef.current.value = val;
+          const s = self.progress < 0.005 ? -1 : Math.min(5, Math.floor(val));
           setStage(s);
+          
+          // Update DOM directly for smooth text without React re-render overhead
+          const textEl = document.getElementById("process-progress-text");
+          if (textEl) {
+            textEl.innerText = `STAGE ${Math.max(0, s)} / PROGRESS ${val.toFixed(2)}`;
+          }
+          const barEl = document.getElementById("process-progress-bar");
+          if (barEl) {
+            barEl.style.width = `${(Math.max(0, s) / 5) * 100}%`;
+          }
         },
       }
     });
@@ -151,19 +162,25 @@ export default function TheProcess() {
         {/* 3D Canvas */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Canvas camera={{ position: [0, 3, 9], fov: 50 }} gl={{ alpha: true, antialias: true }}>
-            <ProcessLab progressRef={progressRef} />
+            <Suspense fallback={null}>
+              <ProcessLab progressRef={progressRef} />
+            </Suspense>
           </Canvas>
         </div>
 
         {/* ── DEBUG: scroll progress bar ── */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-white/10 z-50 pointer-events-none">
           <div
+            id="process-progress-bar"
             className="h-full bg-[#00f0ff] transition-none"
             style={{ width: `${((Math.max(0, stage) / 5) * 100)}%` }}
           />
         </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none font-mono text-[10px] text-white/40 tracking-widest">
-          STAGE {stage} / PROGRESS {progressRef.current.value.toFixed(2)}
+        <div 
+          id="process-progress-text"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none font-mono text-[10px] text-white/40 tracking-widest"
+        >
+          STAGE {Math.max(0, stage)} / PROGRESS {progressRef.current.value.toFixed(2)}
         </div>
 
         {/* ════════════════════════════════════════
@@ -176,32 +193,29 @@ export default function TheProcess() {
 
             {/* Mission header */}
             <div>
-              <div className="font-mono text-[10px] text-white/40 tracking-[0.4em] uppercase mb-1">
-                MISSION 001
-              </div>
-              <div className="font-mono text-[10px] text-[#00f0ff] tracking-[0.3em] uppercase mb-8">
-                AUTONOMOUS SYSTEM
+              <div className="section-label mb-8">
+                <span className="section-label-text">THE PROCESS</span>
               </div>
 
               {/* Stage number & phase */}
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="popLayout">
                 <motion.div
                   key={stage}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.35 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="font-mono text-[10px] tracking-[0.4em] mb-2" style={{ color: current?.color ?? "#00f0ff" }}>
                     {current?.id ?? "00"} / {current?.codename ?? "INITIALISING"}
                   </div>
                   <h2
-                    className="text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-[0.9] mb-6"
+                    className="section-heading mb-6"
                     style={{ textShadow: `0 0 30px ${current?.color ?? "#00f0ff"}44` }}
                   >
                     {current?.phase ?? "—"}
                   </h2>
-                  <p className="text-white/60 text-sm lg:text-base font-light leading-relaxed max-w-sm">
+                  <p className="section-body">
                     {current?.desc ?? "Waiting for mission start…"}
                   </p>
                 </motion.div>
@@ -289,7 +303,7 @@ export default function TheProcess() {
               </AnimatePresence>
 
               {/* Telemetry rows */}
-              <div className="p-6">
+              <div style={{ padding: '1.5rem' }}>
                 <div className="font-mono text-[9px] text-[#00f0ff] tracking-[0.4em] uppercase mb-4 pb-3 border-b border-white/10 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
                   Mission Status
@@ -340,7 +354,8 @@ export default function TheProcess() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="mt-4 bg-[#ff4444]/10 border border-[#ff4444]/40 p-4 rounded-sm text-center"
+                  style={{ padding: '1rem' }}
+                  className="mt-4 bg-[#ff4444]/10 border border-[#ff4444]/40 rounded-sm text-center"
                 >
                   <div className="font-mono text-[10px] text-[#ff4444] tracking-[0.3em] uppercase">
                     FROM IDEA → AUTONOMY
@@ -354,13 +369,12 @@ export default function TheProcess() {
         {/* ════════════════════════════════════════
             MOBILE LAYOUT
         ════════════════════════════════════════ */}
-        <div className="md:hidden absolute inset-0 z-10 flex flex-col justify-between p-6">
+        <div style={{ padding: '1.5rem' }} className="md:hidden absolute inset-0 z-10 flex flex-col justify-between">
 
           {/* Top HUD */}
           <div className="flex items-center justify-between">
-            <div>
-              <div className="font-mono text-[8px] text-white/30 tracking-[0.3em]">MISSION 001</div>
-              <div className="font-mono text-[8px] text-[#00f0ff] tracking-[0.3em]">AUTONOMOUS SYSTEM</div>
+            <div className="section-label mb-0 scale-90 origin-left">
+              <span className="section-label-text">PROCESS</span>
             </div>
             <div
               className="font-mono text-[8px] tracking-widest animate-pulse"
@@ -396,17 +410,17 @@ export default function TheProcess() {
                 </div>
               )}
 
-              <div className="p-5">
+              <div style={{ padding: '1.25rem' }}>
                 <div
                   className="font-mono text-[9px] tracking-[0.4em] uppercase mb-2"
                   style={{ color: current?.color ?? "#00f0ff" }}
                 >
                   {current?.id ?? "00"} / {current?.codename ?? "INITIALISING"}
                 </div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter leading-none mb-3">
+                <h3 className="section-heading mb-3" style={{ fontSize: "2rem" }}>
                   {current?.phase ?? "—"}
                 </h3>
-                <p className="text-white/55 text-xs leading-relaxed mb-4">{current?.desc}</p>
+                <p className="section-body text-xs mb-4">{current?.desc}</p>
 
                 {/* Mini telemetry */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">

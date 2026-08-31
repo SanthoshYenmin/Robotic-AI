@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, Suspense } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -15,6 +15,7 @@ export default function Expertise() {
   const treeRef = useRef<ExpertiseTreeRef>(null);
   
   const [isMounted, setIsMounted] = useState(false);
+  const [treeLoaded, setTreeLoaded] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<number | null>(null);
 
   // HTML Element Refs
@@ -26,7 +27,7 @@ export default function Expertise() {
 
   useGSAP(() => {
     const section = sectionRef.current;
-    if (!section || !isMounted || !treeRef.current) return;
+    if (!section || !treeLoaded || !treeRef.current) return;
 
     const { 
       coreRef, line1Ref, line2Ref, line3Ref, line4Ref,
@@ -39,15 +40,16 @@ export default function Expertise() {
     // DESKTOP ANIMATION
     // ------------------------------------
     mm.add("(min-width: 768px)", () => {
-      // Initial 3D states — target .scale (Vector3) directly, not wrapped in array
-      if (line1Ref.current) gsap.set(line1Ref.current.scale, { x: 0, y: 0, z: 0 });
-      if (line2Ref.current) gsap.set(line2Ref.current.scale, { x: 0, y: 0, z: 0 });
-      if (line3Ref.current) gsap.set(line3Ref.current.scale, { x: 0, y: 0, z: 0 });
-      if (line4Ref.current) gsap.set(line4Ref.current.scale, { x: 0, y: 0, z: 0 });
+      // Initial 3D states — target .scale (Vector3) directly
+      if (coreRef.current) gsap.set(coreRef.current.scale, { x: 0, y: 0, z: 0 });
       if (node1Ref.current) gsap.set(node1Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (node2Ref.current) gsap.set(node2Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (node3Ref.current) gsap.set(node3Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (node4Ref.current) gsap.set(node4Ref.current.scale, { x: 0, y: 0, z: 0 });
+      if (line1Ref.current) gsap.set(line1Ref.current.scale, { x: 0, y: 0, z: 0 });
+      if (line2Ref.current) gsap.set(line2Ref.current.scale, { x: 0, y: 0, z: 0 });
+      if (line3Ref.current) gsap.set(line3Ref.current.scale, { x: 0, y: 0, z: 0 });
+      if (line4Ref.current) gsap.set(line4Ref.current.scale, { x: 0, y: 0, z: 0 });
 
       // Reset positions in case they were changed by mobile
       if (node1Ref.current) gsap.set(node1Ref.current.position, { x: -3, y: 2, z: 0 });
@@ -56,51 +58,51 @@ export default function Expertise() {
       if (node4Ref.current) gsap.set(node4Ref.current.position, { x: 3, y: -2, z: 0 });
 
       // Initial HTML states
-      gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], { opacity: 0, y: 20 });
-      gsap.set(titleRef.current, { opacity: 0, scale: 0.9 });
-      if (coreRef.current) gsap.set(coreRef.current.scale, { x: 1, y: 1, z: 1 });
+      gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], { opacity: 0, y: 50 });
+      gsap.set(titleRef.current, { opacity: 0, scale: 0.8 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=4000",
+          end: "+=3500", // Increased scroll length for smoother sequence
           pin: true,
           scrub: 1,
           refreshPriority: 8,
         }
       });
 
-      // Step 1: AI & Robotics (Top Left)
-      tl.to(line1Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 }, 0)
-        .to(node1Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, 0.5)
-        .to(card1Ref.current, { opacity: 1, y: 0, duration: 1 }, 1);
-
-      // Step 2: Computer Vision (Top Right)
-      tl.to(line2Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 }, 2)
-        .to(node2Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, 2.5)
-        .to(card2Ref.current, { opacity: 1, y: 0, duration: 1 }, 3);
-
-      // Step 3: Autonomous Systems (Bottom Left)
-      tl.to(line3Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 }, 4)
-        .to(node3Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, 4.5)
-        .to(card3Ref.current, { opacity: 1, y: 0, duration: 1 }, 5);
-
-      // Step 4: Robotics Automation (Bottom Right)
-      tl.to(line4Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 }, 6)
-        .to(node4Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, 6.5)
-        .to(card4Ref.current, { opacity: 1, y: 0, duration: 1 }, 7);
-
-      // Final Step: Central Title Reveals
-      tl.to(coreRef.current!.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 2, ease: "power2.inOut" }, 8)
-        .to(titleRef.current, { opacity: 1, scale: 1, duration: 2, ease: "power2.out" }, 8);
+      // 1. Central Globe Appears
+      tl.to(coreRef.current!.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 2, ease: "back.out(1.5)" })
+      // 2. Title Appears
+        .to(titleRef.current, { opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" })
+      
+      // 3. First Node Sequence (Top Left)
+        .to(line1Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 })
+        .to(node1Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.2")
+        .to(card1Ref.current, { opacity: 1, y: 0, duration: 1 }, "-=0.2")
+        
+      // 4. Second Node Sequence (Top Right)
+        .to(line2Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 })
+        .to(node2Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.2")
+        .to(card2Ref.current, { opacity: 1, y: 0, duration: 1 }, "-=0.2")
+        
+      // 5. Third Node Sequence (Bottom Left)
+        .to(line3Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 })
+        .to(node3Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.2")
+        .to(card3Ref.current, { opacity: 1, y: 0, duration: 1 }, "-=0.2")
+        
+      // 6. Fourth Node Sequence (Bottom Right)
+        .to(line4Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1 })
+        .to(node4Ref.current!.scale, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.2")
+        .to(card4Ref.current, { opacity: 1, y: 0, duration: 1 }, "-=0.2");
     });
 
     // ------------------------------------
     // MOBILE ANIMATION
     // ------------------------------------
     mm.add("(max-width: 767px)", () => {
-      // Hide all lines on mobile — target .scale (Vector3) individually
+      // Hide all lines on mobile
       if (line1Ref.current) gsap.set(line1Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (line2Ref.current) gsap.set(line2Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (line3Ref.current) gsap.set(line3Ref.current.scale, { x: 0, y: 0, z: 0 });
@@ -117,6 +119,15 @@ export default function Expertise() {
 
       // HTML setup
       gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], { opacity: 0, y: 50 });
+
+      // Pin the 3D background using GSAP since CSS sticky might fail due to overflow parents
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: "bottom bottom",
+        pin: section.querySelector(".mobile-3d-bg"),
+        pinSpacing: false,
+      });
 
       // Intro ScrollTrigger — target .scale (Vector3)
       if (coreRef.current) {
@@ -171,19 +182,19 @@ export default function Expertise() {
     });
 
     return () => mm.revert(); // Cleanup matchMedia
-  }, { scope: sectionRef, dependencies: [isMounted] });
+  }, { scope: sectionRef, dependencies: [treeLoaded] });
 
   const Card = ({ refObj, num, title, desc, onHover, onLeave, alignClass, style }: any) => (
     <div 
       ref={refObj} 
       onMouseEnter={onHover} 
       onMouseLeave={onLeave}
-      style={style}
-      className={`w-[85vw] max-w-sm md:w-72 p-6 md:p-8 backdrop-blur-md bg-black/60 border border-white/10 hover:border-[#00f0ff]/50 transition-colors duration-300 mx-auto md:mx-0 ${alignClass}`}
+      style={{ ...style, padding: '0.8rem' }}
+      className={`w-[85vw] max-w-sm md:w-80 backdrop-blur-md bg-black/60 border border-[#00f0ff]/60 shadow-[0_0_20px_rgba(0,240,255,0.1)] hover:border-[#00f0ff] hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:scale-105 transition-all duration-300 mx-auto md:mx-0 rounded-lg ${alignClass}`}
     >
-      <div className="text-[#00f0ff] font-mono text-xs tracking-widest mb-2 md:mb-4">{num}</div>
-      <h3 className="text-white font-bold text-lg md:text-xl mb-2 md:mb-4">{title}</h3>
-      <p className="text-white/60 text-sm leading-relaxed">{desc}</p>
+      <div className="text-[#00f0ff] font-mono text-sm tracking-widest mb-3 md:mb-5">{num}</div>
+      <h3 className="text-white font-bold text-xl md:text-2xl mb-3 md:mb-5">{title}</h3>
+      <p className="text-white/70 text-sm md:text-base leading-relaxed">{desc}</p>
     </div>
   );
 
@@ -191,7 +202,7 @@ export default function Expertise() {
     <section ref={sectionRef} className="relative w-full md:h-screen bg-[#0a0f12] md:overflow-hidden">
       
       {/* 3D Scene - Sticky for mobile, Absolute for desktop */}
-      <div className="sticky top-0 w-full h-[100svh] z-10 pointer-events-none md:absolute md:inset-0">
+      <div className="mobile-3d-bg sticky top-0 w-full h-[100svh] z-10 pointer-events-none md:absolute md:inset-0">
         
         {/* Background Grid */}
         <div className="absolute inset-0 z-0 opacity-10" style={{
@@ -200,15 +211,20 @@ export default function Expertise() {
         }} />
 
         <Canvas camera={{ position: [0, 0, 7], fov: 50 }} gl={{ alpha: true, antialias: true }} onCreated={() => setIsMounted(true)}>
-          <ExpertiseTree ref={treeRef} hoveredNode={hoveredNode} />
+          <Suspense fallback={null}>
+            {isMounted && <ExpertiseTree ref={treeRef} hoveredNode={hoveredNode} onReady={() => setTreeLoaded(true)} />}
+          </Suspense>
         </Canvas>
         
         {/* Central Title Reveal (Desktop Only) */}
         <div ref={titleRef} className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none z-20">
-          <div className="backdrop-blur-sm bg-black/40 p-8 border border-[#00f0ff]/20 rounded-2xl text-center">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
+          <div 
+            style={{ padding: '0.8rem' }}
+            className="backdrop-blur-sm bg-black/40 border border-[#00f0ff]/20 rounded-2xl text-center"
+          >
+            <h2 className="section-heading mb-0">
               Where Intelligence <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-white/50">Meets Engineering.</span>
+              <span className="heading-cyan">Meets Engineering.</span>
             </h2>
           </div>
         </div>
@@ -221,11 +237,9 @@ export default function Expertise() {
           {/* Desktop: Section label + short description — top-left */}
           <div className="hidden md:block md:absolute spx-l pointer-events-none" style={{ top: '128px' }}>
             <div className="section-label mb-1">
-              <span className="section-label-num">03</span>
-              <div className="section-label-divider" />
-              <span className="section-label-text">02 / EXPERTISE</span>
+              <span className="section-label-text">EXPERTISE</span>
             </div>
-            <p className="section-body" style={{ fontSize: '11px', lineHeight: '1.6', maxWidth: '180px', opacity: 0.4 }}>
+            <p className="section-body text-[11px] max-w-[180px] opacity-40 leading-relaxed">
               Robotics · AI · Automation
             </p>
           </div>
@@ -233,9 +247,7 @@ export default function Expertise() {
           {/* Mobile: Full scrollable header (label + title + description) */}
           <div className="md:hidden pt-24 pb-48 px-6">
             <div className="section-label">
-              <span className="section-label-num">03</span>
-              <div className="section-label-divider" />
-              <span className="section-label-text">02 / EXPERTISE</span>
+              <span className="section-label-text">EXPERTISE</span>
             </div>
             <div className="mt-6 mb-10">
               <h2 className="section-heading">

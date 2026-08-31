@@ -31,12 +31,22 @@ export default function SmoothScroller({ children }: { children: React.ReactNode
     };
     window.addEventListener("load", onLoad);
 
+    // Watch for dynamic height changes (images loading, 3D canvases mounting) to fix empty scroll issues
+    let resizeTimer: NodeJS.Timeout;
+    const resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
+    });
+    resizeObserver.observe(document.body);
+
     return () => {
       lenis.off("scroll", ScrollTrigger.update);
       gsap.ticker.remove(ticker);
       window.removeEventListener("load", onLoad);
+      resizeObserver.disconnect();
       lenis.destroy();
-      ScrollTrigger.killAll();
     };
   }, []);
 
