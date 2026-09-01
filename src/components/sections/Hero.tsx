@@ -167,13 +167,16 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Main Heading */}
-            <div ref={headingRef} className="absolute top-[35%] left-8 md:left-16 lg:left-24">
+            {/* Main Heading & Description */}
+            <div ref={headingRef} className="absolute top-[35%] left-8 md:left-16 lg:left-24 flex flex-col gap-6 z-10">
               <h1 className="section-heading text-[clamp(2.5rem,6vw,6.5rem)] leading-[0.95]">
                 Engineering<br />
                 Intelligence<br />
                 Into Motion.
               </h1>
+              <p className="max-w-xl text-white/70 text-base md:text-lg lg:text-xl font-light leading-relaxed">
+                Pioneering the next generation of autonomous robotic systems. We seamlessly integrate advanced artificial intelligence with state-of-the-art hardware to redefine what's possible in industrial and commercial mobility.
+              </p>
             </div>
 
             {/* HUD Label */}
