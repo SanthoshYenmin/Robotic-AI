@@ -97,12 +97,13 @@ export default function Hero() {
 
   return (
     <div ref={containerRef} className="relative w-full">
+      
       {/* PHASE 1: NOVA ZOOM */}
-      <div className="w-full">
-        <div ref={pinRef} className="relative w-full h-[100svh] bg-black overflow-hidden rounded-b-3xl md:rounded-b-[3rem] z-10">
-
-          {/* High-Performance Native Video Background */}
-          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden bg-black">
+      <div className="w-full z-10 relative">
+        <div ref={pinRef} className="relative w-full h-[100svh] overflow-hidden rounded-b-3xl md:rounded-b-[3rem] bg-black">
+          
+          {/* Video is now inside pinRef so it shares the stacking context for mix-blend-mode */}
+          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden" style={{ transform: 'translateZ(0)' }}>
             <video
               src="/videos/hero-banner.mp4"
               autoPlay
@@ -110,20 +111,11 @@ export default function Hero() {
               playsInline
               preload="auto"
               muted={isGlobalMuted || !isInView}
-              onTimeUpdate={(e) => {
-                const video = e.currentTarget;
-                // If we are extremely close to the end, jump back to avoid the MP4 freeze frame
-                // This is a known browser bug with MP4 audio/video track length mismatches
-                if (video.duration && video.currentTime >= video.duration - 0.2) {
-                  video.currentTime = 0.1;
-                  video.play().catch(() => { });
-                }
-              }}
               className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
+              style={{ willChange: 'transform' }}
             />
           </div>
 
-          {/* Audio Toggle Button - Inside pinRef so it scrolls away with the video */}
           <button
             onClick={() => setIsGlobalMuted(!isGlobalMuted)}
             className="absolute top-32 right-8 md:right-16 z-[100] w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 pointer-events-auto cursor-pointer"
@@ -132,20 +124,21 @@ export default function Hero() {
             {isGlobalMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
 
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-0 pointer-events-none" />
-
-          <div ref={maskRef} className="absolute inset-0 z-10 pointer-events-none origin-center">
-            <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
-              <defs>
-                <mask id="nova-mask">
-                  <rect width="1000" height="1000" fill="white" />
-                  <text x="500" y="500" dominantBaseline="middle" textAnchor="middle" fill="black" fontSize="180" fontWeight="900" fontFamily="var(--font-display)" letterSpacing="-5">NOVA</text>
-                </mask>
-              </defs>
-              <rect width="1000" height="1000" fill="#050505" mask="url(#nova-mask)" />
-            </svg>
+          {/* High-Performance CSS Mask (Replaces SVG Mask) */}
+          <div 
+            ref={maskRef} 
+            className="absolute inset-0 z-10 pointer-events-none origin-center flex items-center justify-center bg-[#050505]"
+            style={{ mixBlendMode: 'multiply' }}
+          >
+            <div 
+              className="font-display font-black tracking-tighter text-white" 
+              style={{ fontSize: 'clamp(150px, 25vw, 400px)', letterSpacing: '-0.05em' }}
+            >
+              NOVA
+            </div>
           </div>
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
+          
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce pointer-events-none">
             <span className="text-white/40 text-xs font-mono uppercase tracking-widest">Scroll</span>
             <div className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent" />
           </div>
