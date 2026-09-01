@@ -3,7 +3,7 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas } from "@react-three/fiber";
+import { View, PerspectiveCamera } from "@react-three/drei";
 import TechEcosystem from "@/components/three/TechEcosystem";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -56,16 +56,17 @@ export default function TechnologyStack() {
   }, { scope: sectionRef, dependencies: [isMounted] });
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#08080a] text-white overflow-hidden">
+    <section ref={sectionRef} className="relative w-full bg-transparent text-white overflow-hidden">
       
       {/* 3D Canvas Background (Pinned by GSAP) */}
       <div ref={canvasContainerRef} className="absolute top-0 left-0 w-full h-[100svh] z-0 pointer-events-none">
         {isMounted && (
-          <Canvas camera={{ position: [0, 0, 9], fov: 45 }} gl={{ alpha: true, antialias: true }}>
+          <View className="absolute inset-0 w-full h-full pointer-events-none">
+            <PerspectiveCamera makeDefault position={[0, 0, 9]} fov={45} />
             <Suspense fallback={null}>
               <TechEcosystem />
             </Suspense>
-          </Canvas>
+          </View>
         )}
         
         {/* Subtle gradient overlay to ensure text readability */}

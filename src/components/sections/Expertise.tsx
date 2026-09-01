@@ -5,7 +5,7 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas } from "@react-three/fiber";
+import { View, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import ExpertiseTree, { ExpertiseTreeRef } from "@/components/three/ExpertiseTree";
 
@@ -224,7 +224,7 @@ export default function Expertise() {
   );
 
   return (
-    <section ref={sectionRef} className="relative w-full md:h-screen bg-[#0a0f12] md:overflow-hidden">
+    <section ref={sectionRef} className="relative w-full md:h-screen bg-transparent md:overflow-hidden">
       
       {/* 3D Scene - Sticky for mobile, Absolute for desktop */}
       <div className="mobile-3d-bg sticky top-0 w-full h-[100svh] z-10 pointer-events-none md:absolute md:inset-0">
@@ -235,11 +235,12 @@ export default function Expertise() {
           backgroundSize: "60px 60px"
         }} />
 
-        <Canvas camera={{ position: [0, 0, 7], fov: 50 }} gl={{ alpha: true, antialias: true }}>
+        <View className="absolute inset-0 w-full h-full pointer-events-none z-0">
+          <PerspectiveCamera makeDefault position={[0, 0, 7]} fov={50} />
           <Suspense fallback={null}>
             {isMounted && <ExpertiseTree ref={treeRef} hoveredNode={hoveredNode} onReady={() => setTreeLoaded(true)} />}
           </Suspense>
-        </Canvas>
+        </View>
         
         {/* Central Title Reveal (Desktop Only) */}
         <div ref={titleRef} className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none z-20">

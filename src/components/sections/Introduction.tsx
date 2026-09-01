@@ -5,7 +5,7 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas } from "@react-three/fiber";
+import { View, PerspectiveCamera } from "@react-three/drei";
 import RoboticCore, { RoboticCoreRef } from "@/components/three/RoboticCore";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -138,7 +138,7 @@ export default function Introduction() {
   };
 
   return (
-    <section ref={sectionRef} className="relative w-full h-[100svh] bg-[#050505] overflow-hidden">
+    <section ref={sectionRef} className="relative w-full h-[100svh] bg-transparent overflow-hidden">
 
       {/* Scanning Line (Triggered on CTA Hover) */}
       <div
@@ -153,10 +153,11 @@ export default function Introduction() {
       }} />
 
       {/* 3D Canvas Background */}
-      <div className="absolute inset-0 z-10">
-        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
+      <div className="absolute inset-0 z-0">
+        <View className="absolute inset-0 w-full h-full pointer-events-none">
+          <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} />
           <RoboticCore ref={coreRef} />
-        </Canvas>
+        </View>
       </div>
 
       {/* Interactive Labels overlay for 3D Core - DESKTOP ONLY */}

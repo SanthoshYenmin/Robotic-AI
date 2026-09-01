@@ -10,7 +10,7 @@ import BuildSection from "@/components/sections/BuildSection";
 // without breaking GSAP pin triggers (which rely on element positions)
 function SectionDivider() {
   return (
-    <div className="w-full flex items-center gap-6 px-8 md:px-16 py-32 bg-black">
+    <div className="w-full flex items-center gap-6 px-8 md:px-16 py-32 bg-transparent">
       <div className="flex-1 h-px bg-white/5" />
       <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
       <div className="flex-1 h-px bg-white/5" />
@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <div className="w-full">
       <Hero />
-      <div className="relative z-20 bg-black">
+      <div className="relative z-20 bg-transparent">
         <SectionDivider />
         <Introduction />
         <SectionDivider />

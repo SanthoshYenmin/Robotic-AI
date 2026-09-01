@@ -51,11 +51,11 @@ export default function BuildSection() {
   const isFinal = stage >= 4;
 
   return (
-    <section ref={sectionRef} className="relative w-full h-screen bg-black text-white overflow-hidden">
+    <section ref={sectionRef} className="relative w-full h-screen bg-transparent text-white overflow-hidden">
       
       {/* ── Background: 3D Scene ── */}
-      <div className="absolute inset-0 z-0 bg-black">
-        <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
+      <div className="absolute inset-0 z-0 bg-transparent pointer-events-none">
+        <Suspense fallback={<div className="absolute inset-0 bg-transparent" />}>
           {isInView && <BuildCanvas progressRef={progressRef} />}
         </Suspense>
       </div>

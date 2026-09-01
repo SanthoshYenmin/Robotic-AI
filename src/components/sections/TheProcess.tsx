@@ -5,7 +5,7 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas } from "@react-three/fiber";
+import { View, PerspectiveCamera } from "@react-three/drei";
 import ProcessLab from "../three/ProcessLab";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -157,18 +157,19 @@ export default function TheProcess() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen bg-[#02080a] text-white overflow-hidden"
+      className="relative w-full h-screen bg-transparent text-white overflow-hidden"
     >
       {/* All content sits inside — GSAP makes it fill viewport during pin */}
       <div className="absolute inset-0">
 
         {/* 3D Canvas */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <Canvas camera={{ position: [0, 3, 9], fov: 50 }} gl={{ alpha: true, antialias: true }}>
+          <View className="absolute inset-0 w-full h-full pointer-events-none">
+            <PerspectiveCamera makeDefault position={[0, 3, 9]} fov={50} onUpdate={c => c.lookAt(0, 0, 0)} />
             <Suspense fallback={null}>
               <ProcessLab progressRef={progressRef} />
             </Suspense>
-          </Canvas>
+          </View>
         </div>
 
         {/* ── DEBUG: scroll progress bar ── */}

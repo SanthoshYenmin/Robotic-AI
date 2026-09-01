@@ -5,7 +5,7 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { Canvas } from "@react-three/fiber";
+import { View, PerspectiveCamera } from "@react-three/drei";
 import { motion, Variants } from "framer-motion";
 import AutonomousRover, { AutonomousRoverRef } from "@/components/three/AutonomousRover";
 
@@ -36,7 +36,8 @@ export default function FeaturedProject() {
   const mobileRoverRef = useRef<AutonomousRoverRef>(null);
   
   const isMounted = usePreloaderReady();
-  const [modelLoaded, setModelLoaded] = useState(false);
+  const [desktopLoaded, setDesktopLoaded] = useState(false);
+  const [mobileLoaded, setMobileLoaded] = useState(false);
   
   // HTML Refs
   const titleContainerRef = useRef<HTMLDivElement>(null);
@@ -154,7 +155,7 @@ export default function FeaturedProject() {
     });
 
     return () => mm.revert();
-  }, { scope: sectionRef, dependencies: [modelLoaded] });
+  }, { scope: sectionRef, dependencies: [mobileLoaded] });
 
   // --- DESKTOP ANIMATION HOOK ---
   // Depends on modelLoaded because it targets 3D canvas elements
@@ -168,7 +169,7 @@ export default function FeaturedProject() {
     // DESKTOP ANIMATION (Depends on 3D)
     // ------------------------------------
     mm.add("(min-width: 768px)", () => {
-      if (!modelLoaded || !roverComponentRef.current) return;
+      if (!desktopLoaded || !roverComponentRef.current) return;
 
       const { 
         roverRef, lidarBeamRef, originalPathRef, newPathRef, obstacleRef, cameraGroupRef 
@@ -234,18 +235,19 @@ export default function FeaturedProject() {
     });
 
     return () => mm.revert();
-  }, { scope: sectionRef, dependencies: [modelLoaded] });
+  }, { scope: sectionRef, dependencies: [desktopLoaded] });
 
   return (
-    <section ref={sectionRef} className="relative w-full min-h-[100svh] md:h-[100svh] bg-[#050505] overflow-hidden">
+    <section ref={sectionRef} className="relative w-full min-h-[100svh] md:h-[100svh] bg-transparent overflow-hidden">
       
       {/* 3D Scene - Desktop Only */}
-      <div className="hidden md:block absolute inset-0 z-10">
-        <Canvas camera={{ position: [0, 4, 10], fov: 45 }} gl={{ alpha: true, antialias: true }}>
+      <div className="hidden md:block absolute inset-0 z-0">
+        <View className="absolute inset-0 w-full h-full pointer-events-none">
+          <PerspectiveCamera makeDefault position={[0, 4, 10]} fov={45} onUpdate={c => c.lookAt(0, 0, 0)} />
           <Suspense fallback={null}>
-            {isMounted && <AutonomousRover ref={roverComponentRef} onReady={() => setModelLoaded(true)} />}
+            {isMounted && <AutonomousRover ref={roverComponentRef} onReady={() => setDesktopLoaded(true)} />}
           </Suspense>
-        </Canvas>
+        </View>
       </div>
 
       {/* HTML Overlays (Desktop Only) */}
@@ -372,13 +374,14 @@ export default function FeaturedProject() {
             <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#00f0ff]/50"></div>
             
             {/* The Mobile 3D Canvas */}
-            <Canvas camera={{ position: [3, 2, 3], fov: 45 }}>
+            <View className="absolute inset-0 w-full h-full pointer-events-none">
+              <PerspectiveCamera makeDefault position={[3, 2, 3]} fov={45} onUpdate={c => c.lookAt(0, 0, 0)} />
               <ambientLight intensity={1.5} />
               <directionalLight position={[5, 10, 5]} intensity={2} />
               <Suspense fallback={null}>
-                <AutonomousRover ref={mobileRoverRef} onReady={() => setModelLoaded(true)} />
+                <AutonomousRover ref={mobileRoverRef} onReady={() => setMobileLoaded(true)} />
               </Suspense>
-            </Canvas>
+            </View>
           </div>
 
         </motion.div>
