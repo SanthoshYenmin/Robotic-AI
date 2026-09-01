@@ -85,11 +85,9 @@ export default function BuildSection() {
         )}
       </AnimatePresence>
 
-      {/* ── Section Label (06 / LET'S BUILD) ── */}
+      {/* ── Section Label (LET'S BUILD) ── */}
       <div className="absolute z-30 pointer-events-none spx-l" style={{ top: "80px" }}>
         <div className="section-label">
-          <span className="section-label-num">06</span>
-          <div className="section-label-divider" />
           <span className="section-label-text">LET'S BUILD</span>
         </div>
       </div>
@@ -104,7 +102,7 @@ export default function BuildSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="absolute top-[160px] spx-l max-w-lg pointer-events-auto"
+              className="absolute top-[160px] spx-l pr-6 md:pr-0 max-w-lg pointer-events-auto"
             >
               <h2 className="section-heading mb-6 whitespace-pre-line">{SCENES[0].title}</h2>
               <p className="section-body mb-6">{SCENES[0].desc}</p>

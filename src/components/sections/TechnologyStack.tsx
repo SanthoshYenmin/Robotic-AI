@@ -56,7 +56,7 @@ export default function TechnologyStack() {
   }, { scope: sectionRef, dependencies: [isMounted] });
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#08080a] text-white">
+    <section ref={sectionRef} className="relative w-full bg-[#08080a] text-white overflow-hidden">
       
       {/* 3D Canvas Background (Pinned by GSAP) */}
       <div ref={canvasContainerRef} className="absolute top-0 left-0 w-full h-[100svh] z-0 pointer-events-none">
@@ -73,10 +73,10 @@ export default function TechnologyStack() {
       </div>
 
       {/* Foreground Content */}
-      <div className="relative z-10 container mx-auto px-6 md:px-12 pt-[100svh]">
+      <div className="relative z-10 container mx-auto px-6 md:px-12">
         
         {/* Header Spacer & Title */}
-        <div className="min-h-[100svh] flex flex-col justify-center items-center text-center -mt-[100svh]" ref={el => { textElementsRef.current[0] = el; }}>
+        <div className="min-h-[100svh] flex flex-col justify-center items-center text-center" ref={el => { textElementsRef.current[0] = el; }}>
           <div className="section-label justify-center mb-6">
             <span className="section-label-text">TECHNOLOGY</span>
           </div>

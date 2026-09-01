@@ -100,28 +100,23 @@ export default function Expertise() {
     });
 
     // ------------------------------------
-    // MOBILE ANIMATION
+    // MOBILE ANIMATION - INTELLIGENCE PIPELINE
     // ------------------------------------
     mm.add("(max-width: 767px)", () => {
-      // Hide all lines on mobile
+      // Hide all desktop connecting lines and 3D nodes
       if (line1Ref.current) gsap.set(line1Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (line2Ref.current) gsap.set(line2Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (line3Ref.current) gsap.set(line3Ref.current.scale, { x: 0, y: 0, z: 0 });
       if (line4Ref.current) gsap.set(line4Ref.current.scale, { x: 0, y: 0, z: 0 });
 
-      // Center all nodes and hide them initially
       const nodes = [node1Ref.current, node2Ref.current, node3Ref.current, node4Ref.current];
       nodes.forEach(node => {
         if (node) {
-          gsap.set(node.position, { x: 0, y: 1, z: 0 });
           gsap.set(node.scale, { x: 0, y: 0, z: 0 });
         }
       });
 
-      // HTML setup
-      gsap.set([card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current], { opacity: 0, y: 50 });
-
-      // Pin the 3D background using GSAP since CSS sticky might fail due to overflow parents
+      // Pin the 3D background
       ScrollTrigger.create({
         trigger: section,
         start: "top top",
@@ -130,56 +125,82 @@ export default function Expertise() {
         pinSpacing: false,
       });
 
-      // Intro ScrollTrigger — target .scale (Vector3)
+      // Intro Animation - Core enters at top
       if (coreRef.current) {
+        gsap.set(coreRef.current.position, { x: 0, y: 1.5, z: 0 }); // Top center
+        gsap.set(coreRef.current.scale, { x: 0, y: 0, z: 0 });
+        
         gsap.to(coreRef.current.scale, {
-          x: 1.5, y: 1.5, z: 1.5,
+          x: 1, y: 1, z: 1,
+          duration: 1.5,
+          ease: "back.out(1.5)",
           scrollTrigger: {
             trigger: section,
-            start: "top top",
-            end: "+=500",
-            scrub: 1,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
           }
         });
       }
 
-      // Helper for mobile scroll steps
-      const setupMobileCard = (cardRef: any, nodeRef: THREE.Group | null) => {
-        if (!nodeRef || !coreRef.current) return;
-        gsap.to(cardRef, {
-          opacity: 1, y: 0, duration: 0.5,
+      // 1. Pipeline Line Animation (Fills up as user scrolls)
+      const pipelineLine = section.querySelector(".pipeline-line-fill");
+      if (pipelineLine) {
+        gsap.fromTo(pipelineLine, 
+          { height: "0%" },
+          {
+            height: "100%",
+            ease: "none",
+            scrollTrigger: {
+              trigger: section.querySelector(".pipeline-container"),
+              start: "top 50%",
+              end: "bottom 50%",
+              scrub: 0.5,
+            }
+          }
+        );
+      }
+
+      // 2. Sequential Card Activation
+      const cards = [card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current];
+      cards.forEach((card, index) => {
+        if (!card) return;
+        
+        const dot = card.querySelector(".pipeline-dot");
+        
+        // Initial state
+        gsap.set(card, { opacity: 0.4, scale: 0.95 });
+        if (dot) gsap.set(dot, { scale: 0, backgroundColor: "#003333", borderColor: "#006666" });
+
+        // Animation when active
+        const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: cardRef,
-            start: "top 80%",
+            trigger: card,
+            start: "top 60%", // Activate when reaching middle of screen
+            end: "bottom 40%", 
             toggleActions: "play reverse play reverse",
           }
         });
 
-        // Target .scale (Vector3) not the group itself
-        gsap.to(nodeRef.scale, {
-          x: 1.5, y: 1.5, z: 1.5, duration: 0.5, ease: "back.out(1.5)",
-          scrollTrigger: {
-            trigger: cardRef,
-            start: "top 70%",
-            toggleActions: "play reverse play reverse",
-          }
-        });
+        tl.to(card, {
+          opacity: 1,
+          scale: 1.03, // Slight scale up
+          duration: 0.4,
+          ease: "power2.out",
+          boxShadow: "0 0 30px rgba(0,240,255,0.2)",
+          borderColor: "rgba(0,240,255,0.8)"
+        }, 0);
 
-        // Hide core when a specific node is active
-        gsap.to(coreRef.current.scale, {
-          x: 0, y: 0, z: 0, duration: 0.5,
-          scrollTrigger: {
-            trigger: cardRef,
-            start: "top 70%",
-            toggleActions: "play reverse play reverse",
-          }
-        });
-      };
-
-      setupMobileCard(card1Ref.current, node1Ref.current);
-      setupMobileCard(card2Ref.current, node2Ref.current);
-      setupMobileCard(card3Ref.current, node3Ref.current);
-      setupMobileCard(card4Ref.current, node4Ref.current);
+        if (dot) {
+          tl.to(dot, {
+            scale: 1,
+            backgroundColor: "#00f0ff",
+            borderColor: "#ffffff",
+            boxShadow: "0 0 15px rgba(0,240,255,0.8)",
+            duration: 0.4,
+            ease: "back.out(2)"
+          }, 0);
+        }
+      });
     });
 
     return () => mm.revert(); // Cleanup matchMedia
@@ -190,12 +211,15 @@ export default function Expertise() {
       ref={refObj} 
       onMouseEnter={onHover} 
       onMouseLeave={onLeave}
-      style={{ ...style, padding: '0.8rem' }}
-      className={`w-[85vw] max-w-sm md:w-80 backdrop-blur-md bg-black/60 border border-[#00f0ff]/60 shadow-[0_0_20px_rgba(0,240,255,0.1)] hover:border-[#00f0ff] hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:scale-105 transition-all duration-300 mx-auto md:mx-0 rounded-lg ${alignClass}`}
+      style={{ ...style, padding: '1rem' }}
+      className={`w-full md:w-80 backdrop-blur-md bg-black/60 border border-[#00f0ff]/20 shadow-[0_0_10px_rgba(0,240,255,0.05)] md:hover:border-[#00f0ff] md:hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] md:hover:scale-105 transition-all duration-300 mx-auto md:mx-0 rounded-lg ${alignClass}`}
     >
       <div className="text-[#00f0ff] font-mono text-sm tracking-widest mb-3 md:mb-5">{num}</div>
-      <h3 className="text-white font-bold text-xl md:text-2xl mb-3 md:mb-5">{title}</h3>
+      <h3 className="text-white font-bold text-xl md:text-2xl mb-2 md:mb-5">{title}</h3>
       <p className="text-white/70 text-sm md:text-base leading-relaxed">{desc}</p>
+      
+      {/* Mobile Pipeline Dot (Hidden on Desktop) */}
+      <div className="pipeline-dot md:hidden absolute left-[-29px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-[#006666] bg-[#003333] z-20" />
     </div>
   );
 
@@ -261,8 +285,8 @@ export default function Expertise() {
             </p>
           </div>
 
-          {/* 4 Interactive Cards */}
-          <div className="pointer-events-auto flex flex-col md:block gap-[60vh] pb-[30vh] pt-[20vh] md:p-0">
+          {/* Desktop Cards */}
+          <div className="hidden md:block pointer-events-auto">
             <Card 
               refObj={card1Ref} num="01" title="AI & Robotics" 
               desc="Building intelligent robots capable of perception, decision-making, and adaptive behavior."
@@ -270,7 +294,6 @@ export default function Expertise() {
               style={{ top: '22%' }}
               onHover={() => setHoveredNode(1)} onLeave={() => setHoveredNode(null)}
             />
-            {/* Card 2 — top RIGHT, same row as Card 1 */}
             <Card 
               refObj={card2Ref} num="02" title="Computer Vision" 
               desc="Giving robots the ability to see, identify, track, and understand their surroundings."
@@ -278,7 +301,6 @@ export default function Expertise() {
               style={{ top: '22%' }}
               onHover={() => setHoveredNode(2)} onLeave={() => setHoveredNode(null)}
             />
-            {/* Card 3 — bottom LEFT, same row as Card 4 */}
             <Card 
               refObj={card3Ref} num="03" title="Autonomous Systems" 
               desc="Developing robots that can navigate, plan, and operate with minimal human intervention."
@@ -286,7 +308,6 @@ export default function Expertise() {
               style={{ bottom: '10%' }}
               onHover={() => setHoveredNode(3)} onLeave={() => setHoveredNode(null)}
             />
-            {/* Card 4 — bottom RIGHT, same row as Card 3 */}
             <Card 
               refObj={card4Ref} num="04" title="Robotics Automation" 
               desc="Designing automated robotic workflows for industrial and real-world applications."
@@ -294,6 +315,39 @@ export default function Expertise() {
               style={{ bottom: '10%' }}
               onHover={() => setHoveredNode(4)} onLeave={() => setHoveredNode(null)}
             />
+          </div>
+
+          {/* Mobile Intelligence Pipeline */}
+          <div className="md:hidden pipeline-container relative ml-[10vw] pr-[5vw] pb-[20vh] pt-[15vh]">
+            
+            {/* Background track line */}
+            <div className="absolute left-0 top-0 bottom-[20vh] w-[2px] bg-white/10 z-0 rounded-full" />
+            
+            {/* Fill track line */}
+            <div className="pipeline-line-fill absolute left-0 top-0 w-[2px] bg-gradient-to-b from-[#00f0ff] to-[#00f0ff] z-10 shadow-[0_0_15px_rgba(0,240,255,0.5)] rounded-full" />
+
+            <div className="flex flex-col gap-[30vh] pointer-events-auto relative z-20 pl-6">
+              <Card 
+                refObj={card1Ref} num="01" title="AI & Robotics" 
+                desc="Building intelligent robots capable of perception, decision-making, and adaptive behavior."
+                alignClass="relative w-full" 
+              />
+              <Card 
+                refObj={card2Ref} num="02" title="Computer Vision" 
+                desc="Giving robots the ability to see, identify, track, and understand their surroundings."
+                alignClass="relative w-full" 
+              />
+              <Card 
+                refObj={card3Ref} num="03" title="Autonomous Systems" 
+                desc="Developing robots that can navigate, plan, and operate with minimal human intervention."
+                alignClass="relative w-full" 
+              />
+              <Card 
+                refObj={card4Ref} num="04" title="Robotics Automation" 
+                desc="Designing automated robotic workflows for industrial and real-world applications."
+                alignClass="relative w-full" 
+              />
+            </div>
           </div>
 
         </div>

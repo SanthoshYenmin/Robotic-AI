@@ -55,6 +55,9 @@ const NODES = [
 
 function FloatingNodes({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
   const groupRef = useRef<THREE.Group>(null);
+  const { size } = useThree();
+  const isMobile = size.width < 768;
+  const scaleX = isMobile ? 0.5 : 1;
   
   useFrame((state) => {
     const p = progressRef.current.value;
@@ -68,23 +71,26 @@ function FloatingNodes({ progressRef }: { progressRef: React.MutableRefObject<{ 
 
   return (
     <group ref={groupRef} scale={0}>
-      {NODES.map((node, i) => (
-        <group key={node.id}>
-          {/* Connection Line */}
-          <Line points={[node.pos as any, [0, 0, 0]]} color="#00f0ff" transparent opacity={0.3} lineWidth={1} />
-          
-          {/* Node */}
-          <mesh position={node.pos as any}>
-            <sphereGeometry args={[0.08, 16, 16]} />
-            <meshBasicMaterial color="#00f0ff" />
-            <Html center position={[0, -0.4, 0]} className="pointer-events-none">
-              <div className="font-mono text-[9px] tracking-widest text-[#00f0ff] uppercase whitespace-nowrap bg-black/50 px-2 py-1 backdrop-blur-sm border border-[#00f0ff]/20">
-                {node.id}
-              </div>
-            </Html>
-          </mesh>
-        </group>
-      ))}
+      {NODES.map((node, i) => {
+        const adjustedPos: [number, number, number] = [node.pos[0] * scaleX, node.pos[1], node.pos[2]];
+        return (
+          <group key={node.id}>
+            {/* Connection Line */}
+            <Line points={[adjustedPos, [0, 0, 0]]} color="#00f0ff" transparent opacity={0.3} lineWidth={1} />
+            
+            {/* Node */}
+            <mesh position={adjustedPos}>
+              <sphereGeometry args={[0.08, 16, 16]} />
+              <meshBasicMaterial color="#00f0ff" />
+              <Html center position={[0, -0.4, 0]} className="pointer-events-none">
+                <div className="font-mono text-[9px] tracking-widest text-[#00f0ff] uppercase whitespace-nowrap bg-black/50 px-2 py-1 backdrop-blur-sm border border-[#00f0ff]/20">
+                  {node.id}
+                </div>
+              </Html>
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
 }
