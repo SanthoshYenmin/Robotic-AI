@@ -77,7 +77,7 @@ type GLTFResult = GLTF & {
   animations: THREE.AnimationClip[]
 }
 
-export function Model(props: React.JSX.IntrinsicElements['group']) {
+export function Model(props: React.JSX.IntrinsicElements['group'] & { isActive?: boolean }) {
   const group = useRef<THREE.Group>(null)
   const { nodes, materials, animations } = useGLTF('/models/behemoth_from_horizon_zero_dawn.glb') as unknown as GLTFResult
   const { actions } = useAnimations(animations, group)
@@ -85,9 +85,15 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
   useEffect(() => {
     const actionName = Object.keys(actions)[0]
     if (actionName && actions[actionName]) {
-      actions[actionName]?.play()
+      const action = actions[actionName];
+      action?.play();
+      if (props.isActive === false) {
+        action!.paused = true;
+      } else {
+        action!.paused = false;
+      }
     }
-  }, [actions])
+  }, [actions, props.isActive])
 
   return (
     <group ref={group} {...props} dispose={null}>

@@ -4,63 +4,26 @@ import { usePreloaderReady } from "@/hooks/usePreloaderReady";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 
-// Lazy-load the heavy 3D canvas
 const BuildCanvas = lazy(() => import("@/components/sections/_BuildCanvas"));
-
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Stage data ────────────────────────────────────────────────────────────────
-const STAGES = [
+const SCENES = [
   {
-    phase: "DORMANT",
+    id: 0,
     title: "Ready to Build\nSomething Autonomous?",
-    desc: "From the first idea to a fully working robotic system — complex challenges become intelligent machines built to perceive, decide, move, and adapt.",
-  },
-  {
-    phase: "INTELLIGENCE ACTIVATES",
-    title: "The System\nComes Online.",
-    desc: "Perception, decision-making, and autonomy. The foundations of every robot I build.",
-    labels: [
-      { text: "PERCEPTION", top: "20%", left: "8%" },
-      { text: "INTELLIGENCE", top: "32%", left: "72%" },
-      { text: "MOVEMENT", top: "68%", left: "6%" },
-      { text: "AUTONOMY", top: "78%", left: "74%" },
-    ],
-  },
-  {
-    phase: "ASSEMBLY",
-    title: "Components\nConnecting.",
-    desc: "Every part has a purpose. Every connection enables a new capability.",
-    parts: [
-      { text: "◈ CAMERA", top: "14%", left: "44%" },
-      { text: "◈ ARM-L", top: "45%", left: "4%" },
-      { text: "◈ ARM-R", top: "45%", left: "78%" },
-      { text: "◈ CPU", top: "80%", left: "44%" },
-      { text: "◈ SENSOR", top: "28%", left: "76%" },
-      { text: "◈ GRIPPER", top: "68%", left: "77%" },
-    ],
-  },
-  {
-    phase: "AUTONOMOUS",
-    title: "From an Idea\nTo an Autonomous Machine.",
-    desc: "The system is live. Sensors active. Intelligence online. Ready to operate in the real world.",
-  },
-  {
-    phase: "DEPLOY",
-    title: "Let's Build.",
-    desc: "Have a problem worth solving? Let's design the system, build the intelligence, and bring it to life.",
-    cta: true,
-  },
+    desc: "Have an idea, a challenge, or a robotic system in mind? Let’s turn it into an intelligent machine that can perceive, decide, move, and adapt.",
+    support: "From concept and simulation to a working autonomous system — let’s build what’s next."
+  }
 ];
 
-// ─── Component ─────────────────────────────────────────────────────────────────
 export default function BuildSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [stage, setStage] = useState(-1);
+  const [stage, setStage] = useState(0);
   const progressRef = useRef({ value: 0 });
   const isMounted = usePreloaderReady();
+  const isInView = useInView(sectionRef, { margin: "2000px 0px 2000px 0px" });
 
   useGSAP(() => {
     if (!isMounted) return;
@@ -74,197 +37,115 @@ export default function BuildSection() {
         refreshPriority: 5,
         onUpdate(self) {
           progressRef.current.value = self.progress * 5;
-          const s = self.progress < 0.02 ? -1 : Math.min(4, Math.floor(self.progress * 5));
-          setStage(s);
+          const s = self.progress < 0.02 ? 0 : Math.min(4, Math.floor(self.progress * 5));
+          setStage(prev => {
+            if (prev !== s) return s;
+            return prev;
+          });
         },
       },
     });
     tl.to({}, { duration: 5 });
   }, { scope: sectionRef, dependencies: [isMounted] });
 
-  const cur = STAGES[Math.max(0, stage)];
   const isFinal = stage >= 4;
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full h-screen bg-black text-white overflow-hidden"
-    >
+    <section ref={sectionRef} className="relative w-full h-screen bg-black text-white overflow-hidden">
+      
       {/* ── Background: 3D Scene ── */}
       <div className="absolute inset-0 z-0 bg-black">
         <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
-          <BuildCanvas progressRef={progressRef} />
+          {isInView && <BuildCanvas progressRef={progressRef} />}
         </Suspense>
       </div>
 
-      {/* ── Scanlines ── */}
-      <div
-        className="absolute inset-0 z-10 pointer-events-none opacity-[0.018]"
-        style={{ backgroundImage: "repeating-linear-gradient(to bottom,transparent,transparent 2px,rgba(0,0,0,1) 2px,rgba(0,0,0,1) 4px)" }}
-      />
-
-      {/* ── Dark vignette ── */}
-      <div className="absolute inset-0 z-10 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(2,8,16,0.8) 100%)" }} />
-
-      {/* ── Final black overlay ── */}
+      {/* ── Overlay for text readability (Scenes 0-3) ── */}
       <AnimatePresence>
-        {isFinal && (
+        {!isFinal && (
           <motion.div
-            key="blackout"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.88 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            className="absolute inset-0 bg-black z-20 pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 pointer-events-none md:w-1/2"
           />
         )}
       </AnimatePresence>
 
-
-
-      {/* ── Intelligence labels (stage 1) ── */}
+      {/* ── Final Scene Fade out overlay ── */}
       <AnimatePresence>
-        {stage === 1 && cur?.labels?.map((lbl, i) => (
+        {isFinal && (
           <motion.div
-            key={lbl.text}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: i * 0.18, duration: 0.4 }}
-            className="absolute z-25 pointer-events-none font-mono text-[9px] tracking-[0.4em] text-[#00f0ff] flex items-center gap-1.5"
-            style={{ top: lbl.top, left: lbl.left }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
-            {lbl.text}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {/* ── Assembly part labels (stage 2) ── */}
-      <AnimatePresence>
-        {stage === 2 && cur?.parts?.map((pt, i) => (
-          <motion.div
-            key={pt.text}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.55 }}
+            animate={{ opacity: 0.85 }}
             exit={{ opacity: 0 }}
-            transition={{ delay: i * 0.12 }}
-            className="absolute z-25 pointer-events-none font-mono text-[9px] tracking-[0.3em] text-white/60 border border-white/10 px-2 py-1 bg-black/25 backdrop-blur-sm"
-            style={{ top: pt.top, left: pt.left }}
-          >
-            {pt.text}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {/* ── Autonomous status bar (stage 3) ── */}
-      <AnimatePresence>
-        {stage === 3 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute top-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
-          >
-            <div className="flex items-center gap-6 px-6 py-2 border border-[#00f0ff]/30 bg-[#00f0ff]/5 backdrop-blur-md">
-              {["SENSORS: ACTIVE", "AI: ONLINE", "MOTORS: ENGAGED"].map((s) => (
-                <div key={s} className="font-mono text-[9px] tracking-[0.3em] text-[#00f0ff] flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-[#00ff88] animate-pulse" />
-                  {s}
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 bg-black z-10 pointer-events-none"
+          />
         )}
       </AnimatePresence>
 
-      {/* ── Top-Left: Section Label ── */}
+      {/* ── Section Label (06 / LET'S BUILD) ── */}
       <div className="absolute z-30 pointer-events-none spx-l" style={{ top: "80px" }}>
         <div className="section-label">
+          <span className="section-label-num">06</span>
+          <div className="section-label-divider" />
           <span className="section-label-text">LET'S BUILD</span>
         </div>
       </div>
 
-      {/* ── Top-Right: Telemetry (Stages 0-3) ── */}
-      <AnimatePresence>
-        {!isFinal && stage >= 0 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="absolute top-[80px] right-6 md:right-12 z-30 font-mono text-[9px] md:text-[10px] tracking-widest text-[#00f0ff] opacity-70 text-right pointer-events-none"
-          >
-            <div className="mb-2">ASSEMBLY BAY: 04</div>
-            <div className="mb-2">STATUS: {cur?.phase || "DORMANT"}</div>
-            <div className="mb-2">INTEGRITY: {(stage * 25).toString().padStart(3, '0')}%</div>
-            <div className="animate-pulse">UPLINK: ACTIVE</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Dynamic Layout (Stage Text) ── */}
+      {/* ── Scene 01-03: Left Side Text ── */}
       <div className="absolute inset-0 z-30 pointer-events-none flex flex-col">
         <AnimatePresence mode="wait">
-          {isFinal ? (
-            /* STAGE 4 (FINAL): Center Alignment */
+          {(!isFinal && stage >= 0) && (
             <motion.div
-              key="stage-final"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto z-40 px-6"
-            >
-              <div className="font-mono text-[10px] tracking-[0.5em] text-[#00f0ff] mb-6 uppercase animate-pulse">
-                SYSTEM DEPLOYMENT READY
-              </div>
-              <h2 className="section-heading mb-6" style={{ fontSize: "clamp(3rem, 6vw, 4.5rem)" }}>
-                {cur?.title}
-              </h2>
-              <p className="section-body mx-auto max-w-2xl mb-10">
-                {cur?.desc}
-              </p>
-            </motion.div>
-          ) : stage >= 0 ? (
-            /* STAGES 0-3: Top-Left Alignment */
-            <motion.div
-              key={`stage-${stage}`}
+              key="intro-text"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="absolute top-[160px] spx-l max-w-md pointer-events-auto"
+              transition={{ duration: 0.5 }}
+              className="absolute top-[160px] spx-l max-w-lg pointer-events-auto"
             >
-              <div className="font-mono text-[9px] tracking-[0.4em] text-[#00f0ff] mb-3 uppercase">
-                {cur?.phase}
-              </div>
-              <h2 className="section-heading mb-4">
-                {cur?.title}
-              </h2>
-              <p className="section-body">
-                {cur?.desc}
-              </p>
+              <h2 className="section-heading mb-6 whitespace-pre-line">{SCENES[0].title}</h2>
+              <p className="section-body mb-6">{SCENES[0].desc}</p>
+              <p className="section-body text-white/40 italic">{SCENES[0].support}</p>
             </motion.div>
-          ) : null}
+          )}
         </AnimatePresence>
       </div>
 
-      {/* ── Stage progress indicator — right edge ── */}
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3 pointer-events-none">
-        {STAGES.map((s, i) => (
-          <div
-            key={s.phase}
-            className="rounded-full transition-all duration-500"
-            style={{
-              width: 6,
-              height: i === stage ? 28 : 6,
-              background: i <= stage ? "#00f0ff" : "rgba(255,255,255,0.12)",
-              boxShadow: i === stage ? "0 0 10px #00f0ff" : "none",
-            }}
-          />
-        ))}
+      {/* ── Scene 04-05: Final CTA (Center) ── */}
+      <div className="absolute inset-0 z-40 pointer-events-none flex flex-col items-center justify-center">
+        <AnimatePresence>
+          {isFinal && (
+            <motion.div
+              key="cta-center"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+              className="flex flex-col items-center text-center pointer-events-auto px-6"
+            >
+              <div className="font-mono text-[10px] tracking-[0.5em] text-[#00f0ff] mb-8 uppercase animate-pulse flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00ff88]" />
+                SYSTEM READY
+              </div>
+              <h2 className="section-heading mb-12" style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
+                Ready to Build<br/>Something Autonomous?
+              </h2>
+
+              <a href="#" className="font-mono text-xs tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2">
+                LET'S CONNECT <span>↗</span>
+              </a>
+              
+              <div className="mt-16 text-white/30 font-light text-sm italic tracking-wide">
+                Ideas become intelligent machines when we build them.
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+      
     </section>
   );
 }

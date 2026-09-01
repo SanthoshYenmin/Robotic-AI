@@ -13,10 +13,11 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Introduction() {
   const sectionRef = useRef<HTMLElement>(null);
   const coreRef = useRef<RoboticCoreRef>(null);
-  
+
   // DOM Refs for animation
   const leftContentRef = useRef<HTMLDivElement>(null);
-  const labelsRef = useRef<HTMLDivElement>(null);
+  const labelsRefDesktop = useRef<HTMLDivElement>(null);
+  const labelsRefMobile = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
 
@@ -34,9 +35,10 @@ export default function Introduction() {
     let mm = gsap.matchMedia();
 
     // Initial state
-    gsap.set(leftContentRef.current, { opacity: 0, y: 30 }); // Changed from x: -50 to y: 30 for better mobile flow
-    gsap.set(labelsRef.current?.children || [], { opacity: 0, x: -20 });
-    
+    gsap.set(leftContentRef.current, { opacity: 0, y: 30 });
+    gsap.set(labelsRefDesktop.current?.children || [], { opacity: 0, x: -20 });
+    gsap.set(labelsRefMobile.current?.children || [], { opacity: 0, x: -20 });
+
     // Split title for word-by-word reveal
     const titleWords = titleRef.current?.querySelectorAll(".word") || [];
     gsap.set(titleWords, { opacity: 0, y: 20 });
@@ -66,24 +68,31 @@ export default function Introduction() {
 
       // 1. Core expands and shifts
       if (group && rings && innerCore) {
-        tl.to(group.scale, { 
-            x: isDesktop ? 0.65 : 0.45, 
-            y: isDesktop ? 0.65 : 0.45, 
-            z: isDesktop ? 0.65 : 0.45, 
-            duration: 2, ease: "power2.out" 
-          }, 0)
-          .to(group.position, { 
-            x: isDesktop ? 1.2 : 0, 
-            y: isDesktop ? 0 : -2.5, // Shift down on mobile
-            duration: 2, ease: "power2.inOut" 
+        // Offset starting position and scale on mobile so it doesn't overlap text
+        if (!isDesktop) {
+          gsap.set(group.position, { x: 1.0, y: -0.5 });
+          gsap.set(group.scale, { x: 0.1, y: 0.1, z: 0.1 });
+        }
+
+        tl.to(group.scale, {
+          x: isDesktop ? 0.65 : 0.15,
+          y: isDesktop ? 0.65 : 0.15,
+          z: isDesktop ? 0.65 : 0.15,
+          duration: 2, ease: "power2.out"
+        }, 0)
+          .to(group.position, {
+            x: isDesktop ? 1.2 : 1.5, // Shift right on mobile
+            y: isDesktop ? 0 : -1.5, // Shift down on mobile but keep on screen
+            duration: 2, ease: "power2.inOut"
           }, 0)
           .to(rings.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 2 }, 0)
           .to(innerCore.scale, { x: 0.8, y: 0.8, z: 0.8, duration: 2 }, 0);
       }
 
-      // 2. Labels sequentially appear around the core (Desktop only)
-      if (isDesktop && labelsRef.current?.children) {
-        tl.to(labelsRef.current.children, {
+      // 2. Labels sequentially appear
+      const activeLabels = isDesktop ? labelsRefDesktop.current?.children : labelsRefMobile.current?.children;
+      if (activeLabels) {
+        tl.to(activeLabels, {
           opacity: 1,
           x: 0,
           stagger: 0.3,
@@ -94,7 +103,7 @@ export default function Introduction() {
 
       // 3. Left content reveals
       tl.to(leftContentRef.current, { opacity: 1, y: 0, x: 0, duration: 1, ease: "power3.out" }, 1);
-      
+
       // Word by word title reveal
       if (titleWords.length > 0) {
         tl.to(titleWords, {
@@ -117,8 +126,8 @@ export default function Introduction() {
       gsap.to(coreRef.current.innerCoreRef.current.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.3, yoyo: true, repeat: 1 });
     }
     if (scanLineRef.current) {
-      gsap.fromTo(scanLineRef.current, 
-        { y: "-100%", opacity: 0.5 }, 
+      gsap.fromTo(scanLineRef.current,
+        { y: "-100%", opacity: 0.5 },
         { y: "100%", opacity: 0, duration: 1.5, ease: "power1.inOut" }
       );
     }
@@ -130,10 +139,10 @@ export default function Introduction() {
 
   return (
     <section ref={sectionRef} className="relative w-full h-[100svh] bg-[#050505] overflow-hidden">
-      
+
       {/* Scanning Line (Triggered on CTA Hover) */}
-      <div 
-        ref={scanLineRef} 
+      <div
+        ref={scanLineRef}
         className="absolute top-0 left-0 w-full h-[20vh] bg-gradient-to-b from-transparent via-[#00f0ff]/10 to-transparent pointer-events-none z-30 opacity-0 transform -translate-y-full"
       />
 
@@ -150,9 +159,9 @@ export default function Introduction() {
         </Canvas>
       </div>
 
-      {/* Interactive Labels overlay for 3D Core */}
-      <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-end justify-end pb-12 pr-6 md:flex-row md:items-center md:justify-end md:pb-0 md:pr-[10vw]">
-        <div ref={labelsRef} className="flex flex-col gap-4 md:gap-12 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] scale-[0.65] md:scale-100 origin-bottom-right md:origin-right">
+      {/* Interactive Labels overlay for 3D Core - DESKTOP ONLY */}
+      <div className="absolute inset-0 z-20 pointer-events-none hidden md:flex flex-row items-center justify-end pr-[10vw]">
+        <div ref={labelsRefDesktop} className="flex flex-col gap-12 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] origin-right">
           <div className="flex items-center gap-4">
             <span className="w-12 h-px bg-[#00f0ff]/50" />
             <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">AI Core</span>
@@ -173,8 +182,8 @@ export default function Introduction() {
       </div>
 
       {/* Foreground Content */}
-      <div style={{ paddingTop: '140px' }} className="relative z-20 container mx-auto h-full px-6 md:px-12 lg:px-24 pointer-events-none">
-        
+      <div className="relative z-20 container mx-auto h-full pointer-events-none flex flex-col justify-center">
+
         <div ref={leftContentRef} className="w-full max-w-2xl pointer-events-auto">
           {/* Section Marker */}
           <div className="section-label">
@@ -182,20 +191,38 @@ export default function Introduction() {
           </div>
 
           {/* Title */}
-          <h2 ref={titleRef} className="section-heading flex flex-wrap gap-x-4 gap-y-2">
+          <h2 ref={titleRef} className="section-heading flex flex-wrap gap-x-2 md:gap-x-4 gap-y-1 md:gap-y-2">
             {"Turning Ideas Into Intelligent Machines.".split(" ").map((word, i) => (
-              <span key={i} className={`word inline-block ${word === "Intelligent" || word === "Machines." ? "text-[#00f0ff]" : ""}`}>
+              <span key={i} className={`word ${word.includes("Intelligent") || word.includes("Machines") ? "text-[#00f0ff]" : ""}`}>
                 {word}
               </span>
             ))}
           </h2>
 
           {/* Content */}
-          <p className="section-body mb-12">
+          <p className="section-body mb-8">
             I'm a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <strong>software, hardware, AI,</strong> and <strong>intelligent algorithms</strong> to transform ideas into practical robotic systems.
           </p>
 
-
+          {/* MOBILE ONLY LABELS - Right below the text so there's no gap */}
+          <div ref={labelsRefMobile} className="flex md:hidden flex-col gap-3 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] origin-left">
+            <div className="flex items-center gap-4">
+              <span className="w-8 h-px bg-[#00f0ff]/50" />
+              <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">AI Core</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-12 h-px bg-[#00f0ff]/50" />
+              <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Vision</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-6 h-px bg-[#00f0ff]/50" />
+              <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Motion</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="w-10 h-px bg-[#00f0ff]/50" />
+              <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Decision</span>
+            </div>
+          </div>
 
         </div>
       </div>

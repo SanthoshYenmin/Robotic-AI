@@ -28,12 +28,16 @@
   --foreground: #f2f2f2;
   /* Global section horizontal padding — used by container AND all
      absolute-positioned section elements so every edge aligns. */
-  --section-px: clamp(2rem, 6vw, 8rem);
+  --section-px: clamp(1.25rem, 5vw, 6rem); /* 20px on mobile */
 }
 
 /* Horizontal padding helper — matches .container edge */
 .spx  { padding-left: var(--section-px); padding-right: var(--section-px); }
-.spx-l { left: var(--section-px); }
+.spx-l { 
+  left: var(--section-px); 
+  /* Prevent overflow on mobile by limiting max width */
+  max-width: calc(100vw - (var(--section-px) * 2)); 
+}
 .spx-r { right: var(--section-px); }
 
 html,
@@ -156,7 +160,7 @@ body {
 
 /* Standard top padding: 128px — same on every section */
 .section-top {
-  padding-top: 128px;
+  padding-top: clamp(80px, 15vw, 128px);
 }
 
 /* Section eyebrow label — e.g. "01 / WHO I AM" */
@@ -164,24 +168,24 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1rem, 3vw, 2rem);
 }
 .section-label-num {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;   /* 11px */
+  font-size: clamp(0.5rem, 1vw, 0.6875rem);   /* 11px */
   color: rgba(255,255,255,0.25);
   letter-spacing: 0.35em;
   text-transform: uppercase;
 }
 .section-label-divider {
-  width: 3rem;
+  width: clamp(1.5rem, 4vw, 3rem);
   height: 1px;
   background: rgba(255,255,255,0.15);
   flex-shrink: 0;
 }
 .section-label-text {
   font-family: var(--font-mono);
-  font-size: 0.75rem;   /* 12px */
+  font-size: clamp(0.6rem, 1.5vw, 0.75rem);   /* 12px */
   font-weight: 700;
   color: #00f0ff;
   letter-spacing: 0.3em;
@@ -191,18 +195,18 @@ body {
 
 /* Section main heading */
 .section-heading {
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.5rem, 5vw, 3.5rem);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 1.05;
   color: #ffffff;
-  margin-bottom: 1.25rem;
+  margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
 }
 
 /* Section sub-heading (smaller variant) */
 .section-subheading {
-  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-size: clamp(1.125rem, 3vw, 2rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.02em;
@@ -213,9 +217,9 @@ body {
 
 /* Section body / description text */
 .section-body {
-  font-size: 0.9375rem;   /* 15px */
+  font-size: clamp(0.875rem, 2vw, 1rem);   /* 14px-16px */
   font-weight: 300;
-  line-height: 1.8;
+  line-height: 1.7;
   color: rgba(255,255,255,0.55);
   max-width: 36rem;
 }

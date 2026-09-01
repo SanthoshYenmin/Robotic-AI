@@ -1,157 +1,157 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useMemo, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Model as RealRobotModel } from "@/components/three/RobotModel";
+import { Center, Resize, Html, Line } from "@react-three/drei";
+import { Model as BehemothModel } from "@/components/three/BehemothModel";
 
 type BuildLabProps = {
   progressRef: React.MutableRefObject<{ value: number }>;
 };
 
-// ─── Camera Controller ─────────────────────────────────────
+// ─── Camera Controller ───
 function CameraController({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
   const { camera } = useThree();
   useFrame(() => {
-    const p = progressRef.current.value; // 0 to 4
-    let tx = 0, ty = 0.5, tz = 16;
+    const p = progressRef.current.value;
+    let tx = 0, ty = 0.5, tz = 18;
     
     if (p <= 1) {
-      // Stage 0 -> 1: Wide shot, slowly pushing in
-      tx = Math.sin(p * 0.5) * 5;
-      ty = 1.0 + p * 1.5;
-      tz = 16 - p * 3;
-    } else if (p <= 2.5) {
-      // Stage 1 -> 2.5: Orbiting around while parts float
-      const orbit = (p - 1) * 1.5;
-      tx = Math.sin(0.5 + orbit) * 8;
-      ty = 2.5 - (p - 1) * 0.5;
-      tz = 13 - (p - 1) * 2;
-    } else if (p <= 3.5) {
-      // Stage 2.5 -> 3.5: Close in on assembly
-      const dp = p - 2.5;
-      tx = Math.sin(0.5 + 1.5 * 1.5) * 8 * (1 - dp) + 2 * dp;
-      ty = 1.75 - dp * 0.75;
-      tz = 10 - dp * 3;
-    } else {
-      // Stage 3.5 -> 4 (Final): Low dramatic angle
-      const dp = Math.min(1, (p - 3.5) * 2);
-      tx = 2 * (1 - dp) + 0;
-      ty = 1.0 - dp * 1.8; // Look up from below
-      tz = 7 - dp * 3.5;
+      // Scene 01: Inactive, wide shot
+      tx = 4; ty = 0.5; tz = 18;
+    } else if (p <= 2) {
+      // Scene 02: Activation, slightly closer
+      const dp = p - 1;
+      tx = 4 - dp * 2; ty = 0.5 + dp * 0.5; tz = 18 - dp * 3;
+    } else if (p <= 3) {
+      // Scene 03: Floating objects, orbiting
+      const dp = p - 2;
+      tx = Math.sin(dp * Math.PI * 0.5) * 6 + 2; 
+      ty = 1.0 + dp * 0.5; 
+      tz = Math.cos(dp * Math.PI * 0.5) * 12;
+    } else if (p <= 4) {
+      // Scene 04: Robot alive, push into core
+      const dp = Math.min(1, p - 3);
+      tx = Math.sin(Math.PI * 0.5) * 6 * (1 - dp);
+      ty = 1.5 - dp * 0.5;
+      tz = 12 * (1 - dp) + 4 * dp; // Push very close
     }
 
-    camera.position.x += (tx - camera.position.x) * 0.03;
-    camera.position.y += (ty - camera.position.y) * 0.03;
-    camera.position.z += (tz - camera.position.z) * 0.03;
-    camera.lookAt(0, 0.5, 0);
+    camera.position.x += (tx - camera.position.x) * 0.05;
+    camera.position.y += (ty - camera.position.y) * 0.05;
+    camera.position.z += (tz - camera.position.z) * 0.05;
+    camera.lookAt(0, 0, 0);
   });
   return null;
 }
 
-// ─── Background Grid & Scanner ─────────────────────────────
-function BackgroundGrid() {
+// ─── Floating Connection Nodes ───
+const NODES = [
+  { id: "PERCEPTION", pos: [-4, 2, 2] },
+  { id: "INTELLIGENCE", pos: [4, 3, -1] },
+  { id: "CONTROL", pos: [-3, -1, 3] },
+  { id: "AUTONOMY", pos: [3, -1, 2] },
+];
+
+function FloatingNodes({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
+  const groupRef = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    const p = progressRef.current.value;
+    if (groupRef.current) {
+      // Fade in during scene 2->3, fade out at 4
+      const targetScale = (p >= 2 && p < 3.8) ? 1 : 0;
+      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.1));
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime) * 0.2;
+    }
+  });
+
   return (
-    <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.5, 0]}>
-        <planeGeometry args={[60, 60, 40, 40]} />
-        <meshBasicMaterial color="#00f0ff" wireframe transparent opacity={0.06} />
-      </mesh>
-      {/* Center glowing pad */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.49, 0]}>
-        <circleGeometry args={[4, 32]} />
-        <meshBasicMaterial color="#00f0ff" transparent opacity={0.05} />
-      </mesh>
+    <group ref={groupRef} scale={0}>
+      {NODES.map((node, i) => (
+        <group key={node.id}>
+          {/* Connection Line */}
+          <Line points={[node.pos as any, [0, 0, 0]]} color="#00f0ff" transparent opacity={0.3} lineWidth={1} />
+          
+          {/* Node */}
+          <mesh position={node.pos as any}>
+            <sphereGeometry args={[0.08, 16, 16]} />
+            <meshBasicMaterial color="#00f0ff" />
+            <Html center position={[0, -0.4, 0]} className="pointer-events-none">
+              <div className="font-mono text-[9px] tracking-widest text-[#00f0ff] uppercase whitespace-nowrap bg-black/50 px-2 py-1 backdrop-blur-sm border border-[#00f0ff]/20">
+                {node.id}
+              </div>
+            </Html>
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
 
-function ScannerRing({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
-  const ringRef = useRef<THREE.Mesh>(null);
-  useFrame((s) => {
-    const p = progressRef.current.value;
-    if (ringRef.current) {
-       // Sweep up and down
-       ringRef.current.position.y = -2 + Math.sin(s.clock.elapsedTime * 1.5) * 4;
-       // Only visible during assembly
-       const op = (p > 1.5 && p < 3.8) ? 0.6 : 0;
-       const mat = ringRef.current.material as THREE.MeshBasicMaterial;
-       mat.opacity += (op - mat.opacity) * 0.1;
-       ringRef.current.rotation.z += 0.02;
-    }
-  });
-  return (
-    <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[2.5, 2.6, 64]} />
-      <meshBasicMaterial color="#00ff88" side={THREE.DoubleSide} transparent opacity={0} blending={THREE.AdditiveBlending} />
-    </mesh>
-  );
-}
-
-// ─── Ambient Particles ─────────────────────────────────────
-function Particles() {
-  const count = 150;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    positions[i * 3]     = (Math.random() - 0.5) * 25;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 15;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const ref = useRef<THREE.Points>(null);
-  useFrame((s) => { if (ref.current) ref.current.rotation.y = s.clock.elapsedTime * 0.01; });
-  return (
-    <points ref={ref} geometry={geo}>
-      <pointsMaterial color="#00f0ff" size={0.06} transparent opacity={0.4} blending={THREE.AdditiveBlending} />
-    </points>
-  );
-}
-
-// ─── Animated Real Robot ───────────────────────────────────
-function AnimatedRobot({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
+// ─── Robot & Lights ───
+function CinematicRobot({ progressRef }: { progressRef: React.MutableRefObject<{ value: number }> }) {
   const groupRef = useRef<THREE.Group>(null);
+  const coreLightRef = useRef<THREE.PointLight>(null);
+  const scanLightRef = useRef<THREE.SpotLight>(null);
+  const [isActive, setIsActive] = useState(false);
   
-  useFrame((s, d) => {
+  useFrame(() => {
     const p = progressRef.current.value;
     
-    if (groupRef.current) {
-      // Gentle floating animation
-      groupRef.current.position.y = -1.5 + Math.sin(s.clock.elapsedTime * 1.5) * 0.08;
-      
-      // Look around when reaching the final stage
-      if (p > 3.5) {
-         groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, Math.sin(s.clock.elapsedTime * 0.5) * 0.3, 0.05);
+    // Core glow intensity
+    if (coreLightRef.current) {
+      const targetIntensity = p >= 1 ? 5 : 0.5; // Scene 1+ starts glowing
+      coreLightRef.current.intensity = THREE.MathUtils.lerp(coreLightRef.current.intensity, targetIntensity, 0.05);
+    }
+    
+    // Sweeping scan light traveling up the body (Scene 2)
+    if (scanLightRef.current) {
+      if (p >= 1 && p < 2) {
+        // p from 1 to 2 -> sweep y from -3 to 3
+        scanLightRef.current.position.y = (p - 1) * 6 - 3;
+        scanLightRef.current.intensity = 10;
       } else {
-         groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05);
+        scanLightRef.current.intensity = 0;
       }
     }
+
+    // Activate robot animation in Scene 3+
+    if (p >= 2.5 && !isActive) setIsActive(true);
+    else if (p < 2.5 && isActive) setIsActive(false);
   });
 
   return (
     <group ref={groupRef} position={[0, -1.5, 0]}>
-      <RealRobotModel rotation={[Math.PI / 2, 0, 0]} />
+      {/* Core Emissive Light */}
+      <pointLight ref={coreLightRef} position={[0, 1.5, 0]} color="#00f0ff" intensity={0.5} distance={10} />
+      
+      {/* Scanning Light */}
+      <spotLight ref={scanLightRef} position={[0, -3, 4]} angle={0.5} penumbra={1} color="#00ff88" intensity={0} target-position={[0, 0, 0]} />
+
+      <Center bottom>
+        <Resize scale={3}>
+          <BehemothModel rotation={[0, Math.PI, 0]} isActive={isActive} />
+        </Resize>
+      </Center>
     </group>
   );
 }
 
-// ─── Export ────────────────────────────────────────────────
 export default function BuildLab({ progressRef }: BuildLabProps) {
   return (
     <>
-      {/* Force the WebGL background to be dark */}
-      <color attach="background" args={["#020810"]} />
+      <color attach="background" args={["#02050A"]} />
       
-      <ambientLight intensity={1.5} color="#ffffff" />
-      <directionalLight position={[5, 10, 5]} intensity={2} color="#ffffff" castShadow />
-      <directionalLight position={[-5, 5, -5]} intensity={1} color="#ffffff" />
+      {/* Very dim ambient lighting for dark lab vibe */}
+      <ambientLight intensity={0.1} color="#ffffff" />
+      <directionalLight position={[5, 10, 5]} intensity={0.2} color="#ffffff" />
+      <directionalLight position={[-5, 5, -5]} intensity={0.1} color="#00f0ff" />
 
-      <BackgroundGrid />
-      <ScannerRing progressRef={progressRef} />
-      <Particles />
+      <FloatingNodes progressRef={progressRef} />
       <CameraController progressRef={progressRef} />
       
-      {/* Real Robot Model */}
-      <AnimatedRobot progressRef={progressRef} />
+      <CinematicRobot progressRef={progressRef} />
     </>
   );
 }
