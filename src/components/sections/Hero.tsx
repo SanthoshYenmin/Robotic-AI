@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, Suspense, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -147,7 +148,25 @@ export default function Hero() {
   }, { scope: containerRef, dependencies: [isReady] });
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <>
+      {/* 
+        Render the sound button in a portal so it completely escapes all z-index 
+        stacking contexts. It will sit on top of the Navbar and everything else.
+      */}
+      {createPortal(
+        <button
+          onClick={() => setIsGlobalMuted(!isGlobalMuted)}
+          className={`fixed top-6 right-[var(--section-px)] md:top-8 z-[9999] w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#050505]/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-[#050505]/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 cursor-pointer ${
+            isInView ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          aria-label="Toggle Audio"
+        >
+          {isGlobalMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </button>,
+        document.body
+      )}
+
+      <div ref={containerRef} className="relative w-full">
 
       {/* PHASE 1: NOVA ZOOM */}
       <div className="w-full z-10 relative">
@@ -168,13 +187,6 @@ export default function Hero() {
             />
           </div>
 
-          <button
-            onClick={() => setIsGlobalMuted(!isGlobalMuted)}
-            className="absolute top-32 right-8 md:right-16 z-[100] w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 pointer-events-auto cursor-pointer"
-            aria-label="Toggle Audio"
-          >
-            {isGlobalMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-          </button>
 
           {/* High-Performance CSS Mask (Replaces SVG Mask) */}
           <div
@@ -260,6 +272,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
