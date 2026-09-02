@@ -25,7 +25,7 @@ export default function Hero() {
   }, []);
 
   // Audio states
-  const [isGlobalMuted, setIsGlobalMuted] = useState(true);
+  const [isGlobalMuted, setIsGlobalMuted] = useState(false);
   // Track if Hero is in view for audio using GSAP
   const [isInView, setIsInView] = useState(true);
 
@@ -33,6 +33,42 @@ export default function Hero() {
   const pinRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Magic Trick: Prevent freezing without changing the mute button!
+  useEffect(() => {
+    if (isReady && videoRef.current) {
+      // Start with what the user requested
+      videoRef.current.muted = isGlobalMuted;
+
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser blocks sound, secretly mute it just so the video plays!
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => { });
+          }
+        });
+      }
+    }
+  }, [isReady, isGlobalMuted]);
+
+  // Magic Trick Part 2: As soon as they touch the screen, give them their sound back!
+  useEffect(() => {
+    const handleTouch = () => {
+      if (videoRef.current && !isGlobalMuted) {
+        videoRef.current.muted = false;
+      }
+    };
+    window.addEventListener("click", handleTouch, { once: true });
+    window.addEventListener("scroll", handleTouch, { once: true });
+    window.addEventListener("touchstart", handleTouch, { once: true });
+    return () => {
+      window.removeEventListener("click", handleTouch);
+      window.removeEventListener("scroll", handleTouch);
+      window.removeEventListener("touchstart", handleTouch);
+    };
+  }, [isGlobalMuted]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const eyebrowRef = useRef<HTMLDivElement>(null);
@@ -51,7 +87,7 @@ export default function Hero() {
       scrollTrigger: {
         trigger: pin,
         start: "top top",
-        end: "+=2200",
+        end: "+=500",
         pin: true,
         scrub: 1.5,
         refreshPriority: 11,
@@ -71,9 +107,26 @@ export default function Hero() {
     const content = contentRef.current;
     if (!content) return;
 
-    gsap.set([eyebrowRef.current, headingRef.current, descRef.current, statsRef.current, gridRef.current], { opacity: 0 });
+    // Only set initial states for elements that animate AFTER it pins
+    gsap.set([headingRef.current, descRef.current, statsRef.current], { opacity: 0 });
     gsap.set(headingRef.current, { y: 50, skewY: 2 });
-    gsap.set([eyebrowRef.current, descRef.current, statsRef.current], { y: 25 });
+    gsap.set([descRef.current, statsRef.current], { y: 25 });
+
+    // Independent animation that runs WHILE the container is sliding up
+    // This prevents the screen from being completely empty before it pins
+    gsap.fromTo([gridRef.current, eyebrowRef.current],
+      { opacity: 0, y: 25 },
+      {
+        opacity: 1,
+        y: 0,
+        scrollTrigger: {
+          trigger: content,
+          start: "top 70%", // When video has scrolled up and this container is 30% visible
+          end: "top 20%",
+          scrub: 1,
+        }
+      }
+    );
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -88,23 +141,22 @@ export default function Hero() {
       }
     });
 
-    tl.to(gridRef.current, { opacity: 1, duration: 1 })
-      .to(eyebrowRef.current, { opacity: 1, y: 0, duration: 1 })
-      .to(headingRef.current, { opacity: 1, y: 0, skewY: 0, duration: 1.5 })
+    tl.to(headingRef.current, { opacity: 1, y: 0, skewY: 0, duration: 1.5 })
       .to(descRef.current, { opacity: 1, y: 0, duration: 1 })
       .to(statsRef.current, { opacity: 1, y: 0, duration: 1 });
   }, { scope: containerRef, dependencies: [isReady] });
 
   return (
     <div ref={containerRef} className="relative w-full">
-      
+
       {/* PHASE 1: NOVA ZOOM */}
       <div className="w-full z-10 relative">
         <div ref={pinRef} className="relative w-full h-[100svh] overflow-hidden rounded-b-3xl md:rounded-b-[3rem] bg-black">
-          
+
           {/* Video is now inside pinRef so it shares the stacking context for mix-blend-mode */}
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden" style={{ transform: 'translateZ(0)' }}>
             <video
+              ref={videoRef}
               src="/videos/hero-banner.mp4"
               autoPlay
               loop
@@ -125,19 +177,19 @@ export default function Hero() {
           </button>
 
           {/* High-Performance CSS Mask (Replaces SVG Mask) */}
-          <div 
-            ref={maskRef} 
+          <div
+            ref={maskRef}
             className="absolute inset-0 z-10 pointer-events-none origin-center flex items-center justify-center bg-[#050505]"
             style={{ mixBlendMode: 'multiply' }}
           >
-            <div 
-              className="font-display font-black tracking-tighter text-white" 
-              style={{ fontSize: 'clamp(150px, 25vw, 400px)', letterSpacing: '-0.05em' }}
+            <div
+              className="font-display font-black tracking-tighter text-white px-6 md:px-0 w-full text-center overflow-hidden"
+              style={{ fontSize: 'clamp(80px, 22vw, 400px)', letterSpacing: '-0.05em' }}
             >
               NOVA
             </div>
           </div>
-          
+
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce pointer-events-none">
             <span className="text-white/40 text-xs font-mono uppercase tracking-widest">Scroll</span>
             <div className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent" />
@@ -157,10 +209,10 @@ export default function Hero() {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/40 pointer-events-none z-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40 pointer-events-none z-0" />
 
-          <div className="absolute inset-0 z-10 w-full h-full">
+          <div className="absolute inset-0 z-10 w-full h-full flex flex-col justify-center gap-10 container mx-auto px-6 md:px-0 md:block md:gap-0">
 
             {/* Eyebrow */}
-            <div ref={eyebrowRef} className="absolute top-[20%] left-8 md:left-16 lg:left-24">
+            <div ref={eyebrowRef} className="relative md:absolute md:top-[20%] md:left-16 lg:left-24">
               <div className="section-label">
                 <span className="w-8 h-px bg-[#00f0ff] flex-shrink-0" />
                 <span className="section-label-text">ROBOTICS • AI • AUTOMATION</span>
@@ -168,21 +220,21 @@ export default function Hero() {
             </div>
 
             {/* Main Heading & Description */}
-            <div ref={headingRef} className="absolute top-[35%] left-8 md:left-16 lg:left-24 flex flex-col gap-6 z-10">
-              <h1 className="section-heading text-[clamp(2.5rem,6vw,6.5rem)] leading-[0.95]">
+            <div ref={headingRef} className="relative md:absolute md:top-[35%] md:left-16 lg:left-24 flex flex-col z-10">
+              <h1 className="section-heading">
                 Engineering<br />
-                Intelligence<br />
+                <span className="text-[#00f0ff]">Intelligence</span><br />
                 Into Motion.
               </h1>
-              <p className="max-w-xl text-white/70 text-base md:text-lg lg:text-xl font-light leading-relaxed">
+              <p className="section-body max-w-xl">
                 Pioneering the next generation of autonomous robotic systems. We seamlessly integrate advanced artificial intelligence with state-of-the-art hardware to redefine what's possible in industrial and commercial mobility.
               </p>
             </div>
 
             {/* HUD Label */}
-            <div ref={descRef} className="absolute top-[40%] right-8 md:right-16 lg:right-24 w-full max-w-[240px] hidden md:block z-20">
+            <div ref={descRef} className="relative md:absolute md:top-[40%] md:right-16 lg:right-24 w-full max-w-[200px] md:max-w-[240px] z-20 self-start md:self-auto">
               <div
-                style={{ padding: '1.5rem' }}
+                style={{ padding: '1.25rem' }}
                 className="relative border border-[#00f0ff]/30 bg-[#00f0ff]/10 backdrop-blur-md overflow-hidden group shadow-[0_0_20px_rgba(0,240,255,0.15)] rounded-sm"
               >
                 <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00f0ff]" />
@@ -190,13 +242,13 @@ export default function Hero() {
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00f0ff]" />
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00f0ff]" />
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-[#00f0ff] opacity-80 shadow-[0_0_10px_#00f0ff] animate-[scan_2.5s_ease-in-out_infinite]" />
-                <p className="text-[#00f0ff] font-mono text-xs uppercase tracking-[0.2em] mb-2 opacity-80">// SUBJECT</p>
-                <h3 className="text-white font-bold text-xl leading-snug uppercase tracking-wider">3D Humanoid<br />Robot</h3>
+                <p className="text-[#00f0ff] font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1 md:mb-2 opacity-80">// SUBJECT</p>
+                <h3 className="text-white font-bold text-sm md:text-xl leading-snug uppercase tracking-wider">3D Humanoid<br />Robot</h3>
               </div>
             </div>
 
             {/* Stats */}
-            <div ref={statsRef} className="absolute bottom-[15%] right-8 md:right-16 lg:right-24 flex gap-6 lg:gap-12">
+            <div ref={statsRef} className="relative md:absolute md:bottom-[15%] md:right-16 lg:right-24 flex gap-6 lg:gap-12 self-start md:self-auto">
               {[["15+", "Projects"], ["10+", "Tech"], ["5+", "Years"]].map(([num, label]) => (
                 <div key={label} className="flex flex-col gap-1 items-start relative group">
                   <span className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter relative z-10">{num}</span>

@@ -20,6 +20,8 @@ export default function Introduction() {
   const labelsRefMobile = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const scanLineRef = useRef<HTMLDivElement>(null);
+  const sectionMarkerRef = useRef<HTMLDivElement>(null);
+  const paragraphRef = useRef<HTMLParagraphElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMounted = usePreloaderReady();
@@ -35,7 +37,7 @@ export default function Introduction() {
     let mm = gsap.matchMedia();
 
     // Initial state
-    gsap.set(leftContentRef.current, { opacity: 0, y: 30 });
+    gsap.set([sectionMarkerRef.current, paragraphRef.current], { opacity: 0, y: 20 });
     gsap.set(labelsRefDesktop.current?.children || [], { opacity: 0, x: -20 });
     gsap.set(labelsRefMobile.current?.children || [], { opacity: 0, x: -20 });
 
@@ -59,7 +61,7 @@ export default function Introduction() {
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=2000",
+          end: "+=1200",
           pin: true,
           scrub: 1,
           refreshPriority: 9,
@@ -70,19 +72,19 @@ export default function Introduction() {
       if (group && rings && innerCore) {
         // Offset starting position and scale on mobile so it doesn't overlap text
         if (!isDesktop) {
-          gsap.set(group.position, { x: 1.0, y: -0.5 });
+          gsap.set(group.position, { x: 0, y: -1.5 });
           gsap.set(group.scale, { x: 0.1, y: 0.1, z: 0.1 });
         }
 
         tl.to(group.scale, {
-          x: isDesktop ? 0.65 : 0.15,
-          y: isDesktop ? 0.65 : 0.15,
-          z: isDesktop ? 0.65 : 0.15,
+          x: isDesktop ? 0.65 : 0.4, // Make it a bit bigger on mobile so it's visible
+          y: isDesktop ? 0.65 : 0.4,
+          z: isDesktop ? 0.65 : 0.4,
           duration: 2, ease: "power2.out"
         }, 0)
           .to(group.position, {
-            x: isDesktop ? 1.2 : 1.5, // Shift right on mobile
-            y: isDesktop ? 0 : -1.5, // Shift down on mobile but keep on screen
+            x: isDesktop ? 1.2 : 0, // Center on mobile
+            y: isDesktop ? 0 : -2.4, // Move to bottom to prevent overlapping with text
             duration: 2, ease: "power2.inOut"
           }, 0)
           .to(rings.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 2 }, 0)
@@ -101,18 +103,17 @@ export default function Introduction() {
         }, 0.5);
       }
 
-      // 3. Left content reveals
-      tl.to(leftContentRef.current, { opacity: 1, y: 0, x: 0, duration: 1, ease: "power3.out" }, 1);
+      // 3. Sequence: Section Marker -> Heading -> Paragraph
+      if (sectionMarkerRef.current) {
+        tl.to(sectionMarkerRef.current, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.2);
+      }
 
-      // Word by word title reveal
       if (titleWords.length > 0) {
-        tl.to(titleWords, {
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.8,
-          ease: "power2.out"
-        }, 1.5);
+        tl.to(titleWords, { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, 0.4);
+      }
+
+      if (paragraphRef.current) {
+        tl.to(paragraphRef.current, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 1.0);
       }
     });
 
@@ -139,6 +140,13 @@ export default function Introduction() {
 
   return (
     <section ref={sectionRef} className="relative w-full h-[100svh] bg-transparent overflow-hidden">
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 767px) {
+          .mobile-top-spacer {
+            margin-top: 140px !important;
+          }
+        }
+      `}} />
 
       {/* Scanning Line (Triggered on CTA Hover) */}
       <div
@@ -152,15 +160,9 @@ export default function Introduction() {
         backgroundSize: "40px 40px"
       }} />
 
-      {/* 3D Canvas Background */}
-      <div className="absolute inset-0 z-0">
-        <View className="absolute inset-0 w-full h-full pointer-events-none">
-          <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} />
-          <RoboticCore ref={coreRef} />
-        </View>
-      </div>
+      {/* 3D Canvas Background moved inside container below */}
 
-      {/* Interactive Labels overlay for 3D Core - DESKTOP ONLY */}
+      {/* Interactive Labels overlay for 3D Core - DESKTOP ONLY (Commented out per request)
       <div className="absolute inset-0 z-20 pointer-events-none hidden md:flex flex-row items-center justify-end pr-[10vw]">
         <div ref={labelsRefDesktop} className="flex flex-col gap-12 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] origin-right">
           <div className="flex items-center gap-4">
@@ -181,13 +183,15 @@ export default function Introduction() {
           </div>
         </div>
       </div>
+      */}
 
-      {/* Foreground Content */}
-      <div className="relative z-20 container mx-auto h-full pointer-events-none flex flex-col justify-center">
-
-        <div ref={leftContentRef} className="w-full max-w-2xl pointer-events-auto">
+      {/* Foreground Content & 3D Container */}
+      <div className="relative z-20 container mx-auto h-full pointer-events-none flex items-start md:items-center justify-between">
+        
+        {/* Left Side: Text */}
+        <div ref={leftContentRef} className="w-full md:w-1/2 max-w-2xl pointer-events-auto z-20 mobile-top-spacer md:mt-0">
           {/* Section Marker */}
-          <div className="section-label">
+          <div className="section-label" ref={sectionMarkerRef}>
             <span className="section-label-text">WHO I AM</span>
           </div>
 
@@ -201,11 +205,11 @@ export default function Introduction() {
           </h2>
 
           {/* Content */}
-          <p className="section-body mb-8">
+          <p className="section-body" ref={paragraphRef}>
             I'm a robotics engineer passionate about building machines that can see, understand, move, and make decisions. I combine <strong>software, hardware, AI,</strong> and <strong>intelligent algorithms</strong> to transform ideas into practical robotic systems.
           </p>
 
-          {/* MOBILE ONLY LABELS - Right below the text so there's no gap */}
+          {/* MOBILE ONLY LABELS - Right below the text so there's no gap (Commented out per request)
           <div ref={labelsRefMobile} className="flex md:hidden flex-col gap-3 text-[#00f0ff] font-mono text-xs uppercase tracking-[0.3em] origin-left">
             <div className="flex items-center gap-4">
               <span className="w-8 h-px bg-[#00f0ff]/50" />
@@ -224,8 +228,17 @@ export default function Introduction() {
               <span style={{ padding: '0.25rem 0.75rem' }} className="backdrop-blur-sm bg-black/20 border border-[#00f0ff]/20 rounded">Decision</span>
             </div>
           </div>
-
+          */}
         </div>
+
+        {/* Right Side: 3D Animation */}
+        <div className="absolute top-0 bottom-0 right-0 w-full md:w-[60%] z-0 pointer-events-none">
+          <View className="absolute inset-0 w-full h-full pointer-events-none">
+            <PerspectiveCamera makeDefault position={[0, 0, 6]} fov={50} />
+            <RoboticCore ref={coreRef} />
+          </View>
+        </div>
+
       </div>
     </section>
   );

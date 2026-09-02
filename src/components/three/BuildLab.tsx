@@ -2,8 +2,8 @@
 import { useRef, useMemo, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Center, Resize, Html, Line } from "@react-three/drei";
-import { Model as BehemothModel } from "@/components/three/BehemothModel";
+import { Center, Resize, Html, Line, Environment } from "@react-three/drei";
+import { Model as MechaDollModel } from "@/components/three/MechaDollModel";
 
 type BuildLabProps = {
   progressRef: React.MutableRefObject<{ value: number }>;
@@ -15,7 +15,7 @@ function CameraController({ progressRef }: { progressRef: React.MutableRefObject
   useFrame(() => {
     const p = progressRef.current.value;
     let tx = 0, ty = 0.5, tz = 18;
-    
+
     if (p <= 1) {
       // Scene 01: Inactive, wide shot
       tx = 4; ty = 0.5; tz = 18;
@@ -26,8 +26,8 @@ function CameraController({ progressRef }: { progressRef: React.MutableRefObject
     } else if (p <= 3) {
       // Scene 03: Floating objects, orbiting
       const dp = p - 2;
-      tx = Math.sin(dp * Math.PI * 0.5) * 6 + 2; 
-      ty = 1.0 + dp * 0.5; 
+      tx = Math.sin(dp * Math.PI * 0.5) * 6 + 2;
+      ty = 1.0 + dp * 0.5;
       tz = Math.cos(dp * Math.PI * 0.5) * 12;
     } else if (p <= 4) {
       // Scene 04: Robot alive, push into core
@@ -58,12 +58,12 @@ function FloatingNodes({ progressRef }: { progressRef: React.MutableRefObject<{ 
   const { size } = useThree();
   const isMobile = size.width < 768;
   const scaleX = isMobile ? 0.5 : 1;
-  
+
   useFrame((state) => {
     const p = progressRef.current.value;
     if (groupRef.current) {
-      // Fade in during scene 2->3, fade out at 4
-      const targetScale = (p >= 2 && p < 3.8) ? 1 : 0;
+      // Fade in during scene 1.5->2, fade out fully before camera pushes in at 3
+      const targetScale = (p >= 1.2 && p < 2.6) ? 1 : 0;
       groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.1));
       groupRef.current.position.y = Math.sin(state.clock.elapsedTime) * 0.2;
     }
@@ -77,7 +77,7 @@ function FloatingNodes({ progressRef }: { progressRef: React.MutableRefObject<{ 
           <group key={node.id}>
             {/* Connection Line */}
             <Line points={[adjustedPos, [0, 0, 0]]} color="#00f0ff" transparent opacity={0.3} lineWidth={1} />
-            
+
             {/* Node */}
             <mesh position={adjustedPos}>
               <sphereGeometry args={[0.08, 16, 16]} />
@@ -101,16 +101,21 @@ function CinematicRobot({ progressRef }: { progressRef: React.MutableRefObject<{
   const coreLightRef = useRef<THREE.PointLight>(null);
   const scanLightRef = useRef<THREE.SpotLight>(null);
   const [isActive, setIsActive] = useState(false);
-  
-  useFrame(() => {
+
+  useFrame((state, delta) => {
     const p = progressRef.current.value;
-    
+
+    // Continuously rotate the robot
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.3;
+    }
+
     // Core glow intensity
     if (coreLightRef.current) {
       const targetIntensity = p >= 1 ? 5 : 0.5; // Scene 1+ starts glowing
       coreLightRef.current.intensity = THREE.MathUtils.lerp(coreLightRef.current.intensity, targetIntensity, 0.05);
     }
-    
+
     // Sweeping scan light traveling up the body (Scene 2)
     if (scanLightRef.current) {
       if (p >= 1 && p < 2) {
@@ -131,13 +136,13 @@ function CinematicRobot({ progressRef }: { progressRef: React.MutableRefObject<{
     <group ref={groupRef} position={[0, -1.5, 0]}>
       {/* Core Emissive Light */}
       <pointLight ref={coreLightRef} position={[0, 1.5, 0]} color="#00f0ff" intensity={0.5} distance={10} />
-      
+
       {/* Scanning Light */}
       <spotLight ref={scanLightRef} position={[0, -3, 4]} angle={0.5} penumbra={1} color="#00ff88" intensity={0} target-position={[0, 0, 0]} />
 
       <Center bottom>
         <Resize scale={3}>
-          <BehemothModel rotation={[0, Math.PI, 0]} isActive={isActive} />
+          <MechaDollModel rotation={[0, Math.PI, 0]} />
         </Resize>
       </Center>
     </group>
@@ -148,15 +153,16 @@ export default function BuildLab({ progressRef }: BuildLabProps) {
   return (
     <>
       <color attach="background" args={["#02050A"]} />
-      
-      {/* Very dim ambient lighting for dark lab vibe */}
-      <ambientLight intensity={0.1} color="#ffffff" />
-      <directionalLight position={[5, 10, 5]} intensity={0.2} color="#ffffff" />
-      <directionalLight position={[-5, 5, -5]} intensity={0.1} color="#00f0ff" />
+
+      {/* Environment map is required for PBR materials to reflect correctly and show original colors */}
+      <Environment preset="city" />
+      <ambientLight intensity={1.5} color="#ffffff" />
+      <directionalLight position={[5, 10, 5]} intensity={1} color="#ffffff" />
+      <directionalLight position={[-5, 5, -5]} intensity={0.5} color="#ffffff" />
 
       <FloatingNodes progressRef={progressRef} />
       <CameraController progressRef={progressRef} />
-      
+
       <CinematicRobot progressRef={progressRef} />
     </>
   );

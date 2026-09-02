@@ -23,8 +23,8 @@ const mobileContainerVars: Variants = {
 
 const mobileItemVars: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.6, ease: "easeOut" }
   }
@@ -34,18 +34,18 @@ export default function FeaturedProject() {
   const sectionRef = useRef<HTMLElement>(null);
   const roverComponentRef = useRef<AutonomousRoverRef>(null);
   const mobileRoverRef = useRef<AutonomousRoverRef>(null);
-  
+
   const isMounted = usePreloaderReady();
   const [desktopLoaded, setDesktopLoaded] = useState(false);
   const [mobileLoaded, setMobileLoaded] = useState(false);
-  
+
   // HTML Refs
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const techStackRef = useRef<HTMLDivElement>(null);
   const hudSystemRef = useRef<HTMLDivElement>(null);
   const hudMissionRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
-  
+
   // Dynamic HUD Values
   const [hudData, setHudData] = useState({
     speed: 0.0,
@@ -116,7 +116,7 @@ export default function FeaturedProject() {
       // Create a pinned timeline for the mobile scrub
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section, 
+          trigger: section,
           start: "bottom bottom", // Wait until the entire section is fully in view before pinning!
           end: "+=1500",          // Require 1500px of scrolling to finish the animation
           pin: true,
@@ -130,10 +130,10 @@ export default function FeaturedProject() {
         speed: 1.5,
         dist: 24.6,
         obstacles: 1,
-        ease: "none", 
+        ease: "none",
         onUpdate: updateHUD,
         duration: 0.8
-      }, 0); 
+      }, 0);
 
       tl.to(rover.position, {
         z: -1, // Drive forward
@@ -142,14 +142,14 @@ export default function FeaturedProject() {
       }, 0);
 
       // 2. Finally, pop in the Mission Complete badge in the last 20% of the scroll
-      tl.fromTo(missionBadge, 
+      tl.fromTo(missionBadge,
         { opacity: 0, scale: 0.9 },
         {
           opacity: 1,
           scale: 1,
-          duration: 0.2, 
+          duration: 0.2,
           ease: "back.out(1.5)"
-        }, 
+        },
         0.8 // Start this animation at 80% of the timeline
       );
     });
@@ -171,8 +171,8 @@ export default function FeaturedProject() {
     mm.add("(min-width: 768px)", () => {
       if (!desktopLoaded || !roverComponentRef.current) return;
 
-      const { 
-        roverRef, lidarBeamRef, originalPathRef, newPathRef, obstacleRef, cameraGroupRef 
+      const {
+        roverRef, lidarBeamRef, originalPathRef, newPathRef, obstacleRef, cameraGroupRef
       } = roverComponentRef.current;
 
       if (!roverRef?.current) return;
@@ -181,7 +181,7 @@ export default function FeaturedProject() {
       gsap.set(techStackRef.current, { opacity: 0, y: 20 });
       gsap.set(hudSystemRef.current, { opacity: 0 });
       gsap.set(hudMissionRef.current, { opacity: 0, scale: 0.9 });
-      
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -220,7 +220,7 @@ export default function FeaturedProject() {
         .to(roverRef.current!.rotation, { y: -1.107, duration: 0.5 }, 4) // Turn Right to face (2, 0, -1)
         .to(roverRef.current!.position, { x: 2, z: 0, duration: 1, ease: "none" }, 4.5)
         .to(hudDataRef.current, { dist: 8.5, onUpdate: updateHUD, duration: 1 }, 4.5)
-        
+
         .to(roverRef.current!.rotation, { y: 0, duration: 0.5 }, 5.5) // Turn Forward to face (0, 0, -3)
         .to(roverRef.current!.position, { z: -3, duration: 1.5, ease: "none" }, 6)
         .to(hudDataRef.current, { dist: 16.0, onUpdate: updateHUD, duration: 1.5 }, 6)
@@ -239,7 +239,7 @@ export default function FeaturedProject() {
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-[100svh] md:h-[100svh] bg-transparent overflow-hidden">
-      
+
       {/* 3D Scene - Desktop Only */}
       <div className="hidden md:block absolute inset-0 z-0">
         <View className="absolute inset-0 w-full h-full pointer-events-none">
@@ -252,7 +252,7 @@ export default function FeaturedProject() {
 
       {/* HTML Overlays (Desktop Only) */}
       <div className="hidden md:block relative z-20 w-full h-full pointer-events-none">
-        
+
         {/* Dynamic HUD Grid (Top Right) */}
         <div className="absolute top-[128px] spx-r font-mono text-[10px] md:text-xs text-[#00f0ff] opacity-70 tracking-widest text-right pointer-events-none z-30">
           <div className="mb-2">LAT 13.0827° N</div>
@@ -264,7 +264,7 @@ export default function FeaturedProject() {
 
         {/* ─── TOP LEFT: Title & Intro ─── */}
         <div ref={titleContainerRef} className="absolute top-[128px] spx-l max-w-md pointer-events-auto">
-          
+
           {/* Section Marker */}
           <div className="section-label">
             <span className="section-label-text">FEATURED PROJECT</span>
@@ -272,12 +272,12 @@ export default function FeaturedProject() {
 
           {/* Title */}
           <h2 className="section-heading">
-            Autonomous Robotics,<br/>
-            <span className="heading-gradient">Built to Move.</span>
+            Autonomous Robotics,<br />
+            <span className="text-[#00f0ff]">Built to Move.</span>
           </h2>
 
           {/* Description */}
-          <p className="section-body mb-10">
+          <p className="section-body">
             An autonomous mobile robot designed to navigate dynamic environments, detect obstacles, and make intelligent movement decisions in real time.
           </p>
 
@@ -307,9 +307,9 @@ export default function FeaturedProject() {
           </div>
         </div>
 
-        {/* ─── TOP CENTER: Mission Complete & CTA ─── */}
-        <div className="absolute top-[128px] left-1/2 transform -translate-x-1/2 flex flex-col items-center pointer-events-auto z-40">
-          
+        {/* ─── BOTTOM CENTER: Mission Complete & CTA ─── */}
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center pointer-events-auto z-40">
+
           {/* Mission Complete */}
           <div ref={hudMissionRef} style={{ padding: '0.5rem' }} className="w-full min-w-[300px] bg-[#00f0ff]/5 border border-[#00f0ff]/20 backdrop-blur-md mb-8 text-center relative overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.1)]">
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent opacity-50" />
@@ -319,32 +319,33 @@ export default function FeaturedProject() {
         </div>
 
       </div>
-      
+
       {/* Mobile Layout (No 3D, Static Text) */}
-      <motion.div 
-        className="md:hidden flex flex-col justify-center min-h-[100svh] spx-l spx-r py-32 relative z-20 gap-8"
+      <motion.div
+        className="md:hidden flex flex-col justify-start min-h-[100svh] relative z-20 gap-8"
+        style={{ paddingTop: '15vh', paddingBottom: '15vh', paddingLeft: '2rem', paddingRight: '2rem' }}
         variants={mobileContainerVars}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        
+
         <motion.div variants={mobileItemVars} className="section-label">
           <span className="section-label-text">FEATURED PROJECT</span>
         </motion.div>
-        
-        <motion.h2 variants={mobileItemVars} className="section-heading">
-          Autonomous Robotics,<br/>
+
+        <motion.h2 variants={mobileItemVars} className="section-heading max-md:text-[1.3rem]">
+          Autonomous Robotics,<br />
           <span className="heading-gradient">Built to Move.</span>
         </motion.h2>
-        
-        <motion.p variants={mobileItemVars} className="section-body text-white/70">
+
+        <motion.p variants={mobileItemVars} className="section-body text-white/70 max-md:text-[0.9rem] max-md:leading-relaxed">
           An autonomous mobile robot designed to navigate dynamic environments, detect obstacles, and make intelligent movement decisions in real time.
         </motion.p>
 
         {/* Dashboard Row: Stats on Left, 3D on Right */}
         <motion.div variants={mobileItemVars} className="flex w-full items-center justify-between gap-4">
-          
+
           {/* Left Column: Stats */}
           <div className="w-1/2 flex flex-col gap-8">
             {/* HUD System Status (Static) */}
@@ -372,7 +373,7 @@ export default function FeaturedProject() {
             <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#00f0ff]/50"></div>
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#00f0ff]/50"></div>
             <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#00f0ff]/50"></div>
-            
+
             {/* The Mobile 3D Canvas */}
             <View className="absolute inset-0 w-full h-full pointer-events-none">
               <PerspectiveCamera makeDefault position={[3, 2, 3]} fov={45} onUpdate={c => c.lookAt(0, 0, 0)} />
@@ -394,12 +395,12 @@ export default function FeaturedProject() {
             </span>
           ))}
         </motion.div>
-        
+
         {/* Mobile Mission Complete badge (Animated by GSAP at the end) */}
         <div className="mobile-mission-badge opacity-0 p-6 bg-[#00f0ff]/5 border border-[#00f0ff]/20 backdrop-blur-md text-center relative overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.1)]">
-           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent opacity-50" />
-           <div className="text-white font-bold tracking-[0.2em] uppercase text-base mb-2">Mission Complete</div>
-           <div className="text-[#00f0ff] font-mono text-[9px] tracking-[0.25em]">AUTONOMOUS NAVIGATION — SUCCESS</div>
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent opacity-50" />
+          <div className="text-white font-bold tracking-[0.2em] uppercase text-base mb-2">Mission Complete</div>
+          <div className="text-[#00f0ff] font-mono text-[9px] tracking-[0.25em]">AUTONOMOUS NAVIGATION — SUCCESS</div>
         </div>
 
       </motion.div>

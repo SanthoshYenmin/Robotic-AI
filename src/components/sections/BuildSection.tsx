@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 const SCENES = [
   {
     id: 0,
-    title: "Ready to Build\nSomething Autonomous?",
+    title: <>Ready to Build<br /><span className="text-[#00f0ff]">Something Autonomous?</span></>,
     desc: "Have an idea, a challenge, or a robotic system in mind? Let’s turn it into an intelligent machine that can perceive, decide, move, and adapt.",
     support: "From concept and simulation to a working autonomous system — let’s build what’s next."
   }
@@ -52,7 +52,7 @@ export default function BuildSection() {
 
   return (
     <section ref={sectionRef} className="relative w-full h-screen bg-transparent text-white overflow-hidden">
-      
+
       {/* ── Background: 3D Scene ── */}
       <div className="absolute inset-0 z-0 bg-transparent pointer-events-none">
         <Suspense fallback={<div className="absolute inset-0 bg-transparent" />}>
@@ -104,9 +104,9 @@ export default function BuildSection() {
               transition={{ duration: 0.5 }}
               className="absolute top-[160px] spx-l pr-6 md:pr-0 max-w-lg pointer-events-auto"
             >
-              <h2 className="section-heading mb-6 whitespace-pre-line">{SCENES[0].title}</h2>
-              <p className="section-body mb-6">{SCENES[0].desc}</p>
-              <p className="section-body text-white/40 italic">{SCENES[0].support}</p>
+              <h2 className="section-heading">{SCENES[0].title}</h2>
+              <p className="section-body">{SCENES[0].desc}</p>
+              <p className="section-body">{SCENES[0].support}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -128,22 +128,23 @@ export default function BuildSection() {
                 <span className="w-2 h-2 rounded-full bg-[#00ff88]" />
                 SYSTEM READY
               </div>
-              <h2 className="section-heading mb-12" style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
-                Ready to Build<br/>Something Autonomous?
+              <h2 className="section-heading mb-10 md:mb-14" style={{ fontSize: "clamp(2rem, 6vw, 5rem)" }}>
+                Ready to Build<br />
+                <span className="text-[#00f0ff]">Something Autonomous?</span>
               </h2>
 
-              <a href="#" className="font-mono text-xs tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2">
+              <a href="#" className="font-mono text-xs md:text-sm tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2 mb-16">
                 LET'S CONNECT <span>↗</span>
               </a>
-              
-              <div className="mt-16 text-white/30 font-light text-sm italic tracking-wide">
+
+              <div className="text-white/50 font-light text-sm md:text-base tracking-wide">
                 Ideas become intelligent machines when we build them.
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-      
+
     </section>
   );
 }

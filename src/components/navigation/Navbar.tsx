@@ -73,11 +73,12 @@ export default function Navbar() {
           <Link to="/" className="font-mono text-base md:text-lg tracking-[0.3em] font-bold text-white relative group">
             <span className="relative z-10 flex items-center gap-2">
               <span className="w-2 h-2 bg-white group-hover:bg-[#00f0ff] transition-colors" />
-              ROBOTICS
+              NOVA
             </span>
           </Link>
 
-          {/* Center: HUD Menu */}
+          {/* Center: HUD Menu (Commented out for single page layout) */}
+          {/* 
           <nav className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => {
               const isActive = activeMenu === link.name;
@@ -88,7 +89,6 @@ export default function Navbar() {
                   onClick={() => handleNavClick(link.name, link.href)}
                   className="group relative font-mono text-xs tracking-[0.25em] transition-colors duration-300 flex items-center gap-2"
                 >
-                  {/* Active Sensor Dot */}
                   <span 
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       isActive ? "bg-[#00f0ff] shadow-[0_0_8px_#00f0ff]" : "bg-white/20 group-hover:bg-[#00f0ff]/50"
@@ -101,10 +101,12 @@ export default function Navbar() {
               );
             })}
           </nav>
+          */}
 
 
 
-          {/* Mobile Toggle */}
+          {/* Mobile Toggle (Commented out) */}
+          {/* 
           <button
             style={{ padding: '0.5rem' }}
             className="md:hidden text-[#00f0ff] hover:text-white transition-colors"
@@ -123,9 +125,11 @@ export default function Navbar() {
               </svg>
             )}
           </button>
+          */}
         </div>
 
-        {/* Mobile Menu Panel */}
+        {/* Mobile Menu Panel (Commented out) */}
+        {/*
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div 
@@ -159,6 +163,7 @@ export default function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
+        */}
       </motion.header>
     </>
   );

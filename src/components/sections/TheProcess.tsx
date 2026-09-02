@@ -97,9 +97,9 @@ const STATUS_COLORS: Record<string, string> = {
 function TelRow({ label, value }: { label: string; value: string }) {
   const col = STATUS_COLORS[value] ?? "#ffffff66";
   return (
-    <div style={{ padding: '0.375rem 0' }} className="flex items-center justify-between gap-3 border-b border-white/5">
-      <span className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em]">{label}</span>
-      <span className="font-mono text-[10px] tracking-widest flex items-center gap-1.5" style={{ color: col }}>
+    <div style={{ padding: '0.6rem 0' }} className="flex items-center justify-between gap-3 border-b border-white/5">
+      <span className="font-mono text-[10px] leading-none text-white/40 uppercase tracking-[0.2em]">{label}</span>
+      <span className="font-mono text-[10px] leading-none tracking-widest flex items-center gap-2" style={{ color: col }}>
         <span
           className="w-1.5 h-1.5 rounded-full"
           style={{ background: col, boxShadow: `0 0 4px ${col}` }}
@@ -135,7 +135,7 @@ export default function TheProcess() {
           progressRef.current.value = val;
           const s = self.progress < 0.005 ? -1 : Math.min(5, Math.floor(val));
           setStage(s);
-          
+
           // Update DOM directly for smooth text without React re-render overhead
           const textEl = document.getElementById("process-progress-text");
           if (textEl) {
@@ -180,7 +180,7 @@ export default function TheProcess() {
             style={{ width: `${((Math.max(0, stage) / 5) * 100)}%` }}
           />
         </div>
-        <div 
+        <div
           id="process-progress-text"
           className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none font-mono text-[10px] text-white/40 tracking-widest"
         >
@@ -298,17 +298,25 @@ export default function TheProcess() {
                   />
                   {/* Stage label on image */}
                   <div
-                    className="absolute bottom-3 left-4 font-mono text-[10px] tracking-[0.3em] uppercase"
-                    style={{ color: current?.color ?? '#00f0ff', textShadow: '0 0 10px rgba(0,0,0,0.8)' }}
+                    className="absolute bottom-3 left-4 flex items-center justify-center bg-black/80 backdrop-blur-md rounded-md border border-white/10"
+                    style={{ padding: '0.4rem 0.75rem', color: current?.color ?? '#00f0ff' }}
                   >
-                    {current?.id} / {current?.codename}
+                    <span 
+                      className="font-mono text-[10px] uppercase leading-none" 
+                      style={{ letterSpacing: '0.3em', marginRight: '-0.3em', marginTop: '1px' }}
+                    >
+                      {current?.id} / {current?.codename}
+                    </span>
                   </div>
                 </motion.div>
               </AnimatePresence>
 
               {/* Telemetry rows */}
               <div style={{ padding: '1.5rem' }}>
-                <div className="font-mono text-[9px] text-[#00f0ff] tracking-[0.4em] uppercase mb-4 pb-3 border-b border-white/10 flex items-center gap-2">
+                <div 
+                  className="font-mono text-[9px] leading-none text-[#00f0ff] tracking-[0.4em] uppercase border-b border-white/10 flex items-center gap-2"
+                  style={{ paddingBottom: '1rem', marginBottom: '1rem' }}
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
                   Mission Status
                 </div>
@@ -333,15 +341,15 @@ export default function TheProcess() {
                 </AnimatePresence>
 
                 {/* Live coordinates */}
-                <div className="mt-5 pt-4 border-t border-white/5">
-                  <div className="font-mono text-[9px] text-white/40 tracking-widest">
+                <div className="flex flex-col gap-1" style={{ marginTop: '1rem' }}>
+                  <div className="font-mono text-[10px] text-white/50 tracking-widest leading-relaxed">
                     LAT 13.0827° N
                   </div>
-                  <div className="font-mono text-[9px] text-white/40 tracking-widest mt-1">
+                  <div className="font-mono text-[10px] text-white/50 tracking-widest leading-relaxed mb-2">
                     LON 80.2707° E
                   </div>
                   <div
-                    className="font-mono text-[9px] tracking-[0.2em] mt-3 animate-pulse uppercase"
+                    className="font-mono text-[9px] tracking-[0.2em] animate-pulse uppercase flex items-center gap-2"
                     style={{ color: stage >= 0 ? "#00ff88" : "#ffffff22" }}
                   >
                     {stage >= 0 ? "● SYSTEM ACTIVE" : "○ AWAITING DEPLOYMENT"}
