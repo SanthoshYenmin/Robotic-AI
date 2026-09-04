@@ -3,11 +3,25 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState("ABOUT");
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    const handleSync = (e: any) => setIsMuted(e.detail);
+    window.addEventListener('sync-mute', handleSync);
+    return () => window.removeEventListener('sync-mute', handleSync);
+  }, []);
+
+  const toggleMute = () => {
+    const next = !isMuted;
+    setIsMuted(next);
+    window.dispatchEvent(new CustomEvent('toggle-mute', { detail: next }));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,7 +118,14 @@ export default function Navbar() {
           */}
 
 
-
+          {/* Right: Mute Toggle */}
+          <button
+            onClick={toggleMute}
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#050505]/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-[#050505]/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 cursor-pointer"
+            aria-label="Toggle Audio"
+          >
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
         </div>
 
         {/* Mobile Menu Panel (Commented out) */}

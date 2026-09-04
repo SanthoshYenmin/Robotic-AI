@@ -9,10 +9,10 @@ import TechEcosystem from "@/components/three/TechEcosystem";
 gsap.registerPlugin(ScrollTrigger);
 
 const techCategories = [
-  { num: "01", icon: <img src="/images/machine-vision.png" alt="AI & Vision" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "AI & Vision", stack: "OpenCV · ML · Deep Learning", status: "SCANNING ENVIRONMENT...", align: "left" },
-  { num: "02", icon: <img src="/images/programming.png" alt="Programming" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Programming", stack: "Python · C++ · JavaScript", status: "DATA PROCESSING...", align: "right" },
-  { num: "03", icon: <img src="/images/network-interface-card.png" alt="Hardware" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Hardware", stack: "Arduino · Pi · NVIDIA Jetson", status: "COMPONENTS CONNECTED", align: "left" },
-  { num: "04", icon: <img src="/images/robot-assistant.png" alt="Robotics" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Robotics", stack: "ROS · ROS 2 · Gazebo · MoveIt", status: "SYSTEM ACTIVE", align: "right" }
+  { num: "01", icon: <img src={import.meta.env.BASE_URL + "images/machine-vision.png"} alt="AI & Vision" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "AI & Vision", stack: "OpenCV · ML · Deep Learning", status: "SCANNING ENVIRONMENT...", align: "left" },
+  { num: "02", icon: <img src={import.meta.env.BASE_URL + "images/programming.png"} alt="Programming" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Programming", stack: "Python · C++ · JavaScript", status: "DATA PROCESSING...", align: "right" },
+  { num: "03", icon: <img src={import.meta.env.BASE_URL + "images/network-interface-card.png"} alt="Hardware" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Hardware", stack: "Arduino · Pi · NVIDIA Jetson", status: "COMPONENTS CONNECTED", align: "left" },
+  { num: "04", icon: <img src={import.meta.env.BASE_URL + "images/robot-assistant.png"} alt="Robotics" className="w-8 h-8 object-contain opacity-90" style={{ filter: 'drop-shadow(0 0 5px rgba(0,240,255,0.5))' }} />, title: "Robotics", stack: "ROS · ROS 2 · Gazebo · MoveIt", status: "SYSTEM ACTIVE", align: "right" }
 ];
 
 export default function TechnologyStack() {

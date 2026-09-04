@@ -27,7 +27,7 @@ type GLTFResult = GLTF & {
 }
 
 export function Model(props: any) {
-  const { scene } = useGLTF('/models/robot.glb')
+  const { scene } = useGLTF(import.meta.env.BASE_URL + 'models/robot.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
   return (
@@ -45,4 +45,4 @@ export function Model(props: any) {
   )
 }
 
-useGLTF.preload('/models/robot.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/robot.glb')

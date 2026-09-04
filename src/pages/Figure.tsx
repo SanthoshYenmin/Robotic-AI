@@ -22,7 +22,7 @@ export default function FigurePage() {
             transition={{ duration: 1 }}
           >
             <img
-              src="/images/human-form-module-figure-3-image-v3.webp"
+              src={import.meta.env.BASE_URL + "images/human-form-module-figure-3-image-v3.webp"}
               alt="Figure 03 Full Body"
               className="w-[160%] max-w-none h-auto object-contain object-left-top"
             />
@@ -107,7 +107,7 @@ export default function FigurePage() {
           className="w-full relative"
         >
           <video
-            src="/videos/figure-03-01.mp4"
+            src={import.meta.env.BASE_URL + "videos/figure-03-01.mp4"}
             autoPlay
             muted
             loop
@@ -133,7 +133,7 @@ export default function FigurePage() {
           className="w-full relative"
         >
           <video
-            src="/videos/figure-03-02.mp4"
+            src={import.meta.env.BASE_URL + "videos/figure-03-02.mp4"}
             autoPlay
             muted
             loop

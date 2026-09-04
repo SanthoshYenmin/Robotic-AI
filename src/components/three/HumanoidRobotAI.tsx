@@ -20,11 +20,11 @@ type GLTFResult = GLTF & {
   materials: {
     material_0: THREE.MeshStandardMaterial
   }
-  animations: GLTFAction[]
+  animations: THREE.AnimationClip[]
 }
 
-export function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/models/humanoid_robot_ai.glb') as GLTFResult
+export function Model(props: React.JSX.IntrinsicElements['group']) {
+  const { nodes, materials } = useGLTF(import.meta.env.BASE_URL + 'models/humanoid_robot_ai.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Object_4.geometry} material={materials.material_0} />
@@ -33,4 +33,4 @@ export function Model(props: JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/models/humanoid_robot_ai.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/humanoid_robot_ai.glb')

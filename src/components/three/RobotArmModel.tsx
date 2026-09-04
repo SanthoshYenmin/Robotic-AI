@@ -23,7 +23,7 @@ type GLTFResult = GLTF & {
 }
 
 export function Model(props: React.JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/models/6_axis_industrial_robot_arm.glb') as unknown as GLTFResult
+  const { nodes, materials } = useGLTF(import.meta.env.BASE_URL + 'models/6_axis_industrial_robot_arm.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, 0]} scale={0.106}>
@@ -33,4 +33,4 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/models/6_axis_industrial_robot_arm.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/6_axis_industrial_robot_arm.glb')

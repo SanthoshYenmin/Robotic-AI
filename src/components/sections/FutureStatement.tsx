@@ -9,7 +9,7 @@ export default function FutureStatement() {
       <div className="absolute inset-0 z-0">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-40 transition-transform duration-[30s] group-hover:scale-110"
-          style={{ backgroundImage: 'url(/images/nova_future_city_1787818765341.jpg)' }}
+          style={{ backgroundImage: `url(${import.meta.env.BASE_URL}images/nova_future_city_1787818765341.jpg)` }}
         />
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black"></div>

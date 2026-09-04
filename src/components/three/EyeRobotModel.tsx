@@ -31,7 +31,7 @@ type GLTFResult = GLTF & {
 }
 
 export function Model(props: React.JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/models/eye_robot.glb') as unknown as GLTFResult
+  const { nodes, materials } = useGLTF(import.meta.env.BASE_URL + 'models/eye_robot.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, 0]}>
@@ -45,4 +45,4 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/models/eye_robot.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/eye_robot.glb')

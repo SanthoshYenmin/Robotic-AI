@@ -90,11 +90,11 @@ type GLTFResult = GLTF & {
     ['Metal_Dirty.43']: THREE.MeshStandardMaterial
     ['Metal_Dirty.44']: THREE.MeshStandardMaterial
   }
-  animations: GLTFAction[]
+  animations: THREE.AnimationClip[]
 }
 
-export function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/models/robot_a04.glb') as GLTFResult
+export function Model(props: React.JSX.IntrinsicElements['group']) {
+  const { nodes, materials } = useGLTF(import.meta.env.BASE_URL + 'models/robot_a04.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <group position={[0, 0.006, 0.529]} rotation={[-1.57, 0, 0]} scale={0.001}>
@@ -195,4 +195,4 @@ export function Model(props: JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/models/robot_a04.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/robot_a04.glb')

@@ -79,7 +79,7 @@ type GLTFResult = GLTF & {
 
 export function Model(props: React.JSX.IntrinsicElements['group'] & { isActive?: boolean }) {
   const group = useRef<THREE.Group>(null)
-  const { nodes, materials, animations } = useGLTF('/models/behemoth_from_horizon_zero_dawn.glb') as unknown as GLTFResult
+  const { nodes, materials, animations } = useGLTF(import.meta.env.BASE_URL + 'models/behemoth_from_horizon_zero_dawn.glb') as unknown as GLTFResult
   const { actions } = useAnimations(animations, group)
 
   useEffect(() => {
@@ -173,4 +173,4 @@ export function Model(props: React.JSX.IntrinsicElements['group'] & { isActive?:
   )
 }
 
-useGLTF.preload('/models/behemoth_from_horizon_zero_dawn.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/behemoth_from_horizon_zero_dawn.glb')

@@ -20,7 +20,7 @@ const STAGES = [
     desc: "Target location locked. Objective parameters set. Mission authorised.",
     telemetry: { objective: "LOCKED", path: "PENDING", sensor: "OFFLINE", ai: "STANDBY" },
     color: "#00f0ff",
-    image: "/images/process/stage-01-imagine.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-01-imagine.jfif",
   },
   {
     id: "02",
@@ -29,7 +29,7 @@ const STAGES = [
     desc: "Engineering scan complete. Sensor array mapped. Hardware layout finalised.",
     telemetry: { objective: "LOCKED", path: "CALCULATING", sensor: "CALIBRATING", ai: "STANDBY" },
     color: "#00f0ff",
-    image: "/images/process/stage-02-design.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-02-design.jfif",
   },
   {
     id: "03",
@@ -38,7 +38,7 @@ const STAGES = [
     desc: "Virtual environment active. Obstacle avoidance running. Path optimised.",
     telemetry: { objective: "LOCKED", path: "OPTIMISED", sensor: "ACTIVE", ai: "LEARNING" },
     color: "#ffaa00",
-    image: "/images/process/stage-03-simulate.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-03-simulate.jfif",
   },
   {
     id: "04",
@@ -47,7 +47,7 @@ const STAGES = [
     desc: "Blueprint transferred to hardware. Virtual → Physical. Integration complete.",
     telemetry: { objective: "CONFIRMED", path: "LOADED", sensor: "ONLINE", ai: "LOADING" },
     color: "#00f0ff",
-    image: "/images/process/stage-04-build.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-04-build.jfif",
   },
   {
     id: "05",
@@ -56,7 +56,7 @@ const STAGES = [
     desc: "Neural model active. Object recognition at 98.7%. Behaviours learned.",
     telemetry: { objective: "CONFIRMED", path: "READY", sensor: "SCANNING", ai: "ACTIVE" },
     color: "#00ff88",
-    image: "/images/process/stage-05-train.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-05-train.jfif",
   },
   {
     id: "06",
@@ -65,7 +65,7 @@ const STAGES = [
     desc: "All systems nominal. Robot deployed. Mission in progress. No human input required.",
     telemetry: { objective: "IN PROGRESS", path: "EXECUTING", sensor: "LIVE", ai: "AUTONOMOUS" },
     color: "#ff4444",
-    image: "/images/process/stage-06-deploy.jfif",
+    image: import.meta.env.BASE_URL + "images/process/stage-06-deploy.jfif",
   },
 ];
 

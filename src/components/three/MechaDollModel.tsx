@@ -12,7 +12,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props: React.ComponentProps<'group'>) {
-  const { scene } = useGLTF('/models/modular_mecha_doll_neon_mask.glb')
+  const { scene } = useGLTF(import.meta.env.BASE_URL + 'models/modular_mecha_doll_neon_mask.glb')
   return (
     <group {...props} dispose={null}>
       <primitive object={scene} />
@@ -20,4 +20,4 @@ export function Model(props: React.ComponentProps<'group'>) {
   )
 }
 
-useGLTF.preload('/models/modular_mecha_doll_neon_mask.glb')
+useGLTF.preload(import.meta.env.BASE_URL + 'models/modular_mecha_doll_neon_mask.glb')

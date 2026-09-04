@@ -10,7 +10,7 @@ import Figure from "@/pages/Figure";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Preloader />
       <GlobalCanvas />
       <SmoothScroller>

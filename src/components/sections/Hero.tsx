@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, Suspense, useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { Volume2, VolumeX } from "lucide-react";
+
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -29,6 +28,16 @@ export default function Hero() {
   const [isGlobalMuted, setIsGlobalMuted] = useState(false);
   // Track if Hero is in view for audio using GSAP
   const [isInView, setIsInView] = useState(true);
+
+  useEffect(() => {
+    const handleToggle = (e: any) => setIsGlobalMuted(e.detail);
+    window.addEventListener('toggle-mute', handleToggle);
+    return () => window.removeEventListener('toggle-mute', handleToggle);
+  }, []);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('sync-mute', { detail: isGlobalMuted }));
+  }, [isGlobalMuted]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
@@ -149,23 +158,6 @@ export default function Hero() {
 
   return (
     <>
-      {/* 
-        Render the sound button in a portal so it completely escapes all z-index 
-        stacking contexts. It will sit on top of the Navbar and everything else.
-      */}
-      {createPortal(
-        <button
-          onClick={() => setIsGlobalMuted(!isGlobalMuted)}
-          className={`fixed top-6 right-[var(--section-px)] md:top-8 z-[9999] w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#050505]/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-[#050505]/80 hover:border-[#00f0ff]/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 cursor-pointer ${
-            isInView ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-          aria-label="Toggle Audio"
-        >
-          {isGlobalMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>,
-        document.body
-      )}
-
       <div ref={containerRef} className="relative w-full">
 
       {/* PHASE 1: NOVA ZOOM */}
@@ -176,7 +168,7 @@ export default function Hero() {
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden" style={{ transform: 'translateZ(0)' }}>
             <video
               ref={videoRef}
-              src="/videos/hero-banner.mp4"
+              src={import.meta.env.BASE_URL + "videos/hero-banner.mp4"}
               autoPlay
               loop
               playsInline
