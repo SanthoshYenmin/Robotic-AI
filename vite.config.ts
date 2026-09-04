@@ -4,7 +4,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/staging/robotics-ai/',
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
